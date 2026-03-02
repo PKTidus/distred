@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+  rpc Register        (RegisterRequest)  returns (AuthResponse);
+  rpc Login           (LoginRequest)     returns (AuthResponse);
+  rpc Logout          (LogoutRequest)    returns (LogoutResponse);
+  rpc ValidateSession (ValidateRequest)  returns (ValidateResponse);
+  rpc GetUser         (GetUserRequest)   returns (UserResponse);   // for profile / display
+}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message ValidateRequest {
+  string token = 1;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message AuthResponse {
+  string user_id  = 1;
+  string username = 2;
+  string token    = 3;
+  int64  expires  = 4;
+}
+
+message LogoutResponse {
+  bool success = 1;
+}
+
+message ValidateResponse {
+  bool   valid    = 1;
+  string user_id  = 2;
+  string username = 3;
+}
+
+message UserResponse {
+  string user_id    = 1;
+  string username   = 2;
+  int64  created_at = 3;
+}

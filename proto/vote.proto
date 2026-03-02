@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package vote;
+
+service VoteService {
+  rpc CastVote    (CastVoteRequest)    returns (VoteResponse);
+  rpc RemoveVote  (RemoveVoteRequest)  returns (VoteResponse);
+  rpc GetScore    (GetScoreRequest)    returns (ScoreResponse);
+  rpc GetScores   (GetScoresRequest)   returns (GetScoresResponse);  // batch
+  rpc GetUserVote (GetUserVoteRequest) returns (UserVoteResponse);   // did this user vote on this post?
+}
+
+message CastVoteRequest {
+  string post_id = 1;
+  string user_id = 2;
+  int32  value   = 3; // 1 = upvote, -1 = downvote
+}
+
+message RemoveVoteRequest {
+  string post_id = 1;
+  string user_id = 2;
+}
+
+message GetScoreRequest {
+  string post_id = 1;
+}
+
+message GetScoresRequest {
+  repeated string post_ids = 1;
+}
+
+message GetUserVoteRequest {
+  string post_id = 1;
+  string user_id = 2;
+}
+
+message VoteResponse {
+  bool  success   = 1;
+  int32 new_score = 2; // updated score after action
+}
+
+message ScoreResponse {
+  string post_id   = 1;
+  int32  score     = 2;
+  int32  upvotes   = 3;
+  int32  downvotes = 4;
+}
+
+message PostScore {
+  string post_id   = 1;
+  int32  score     = 2;
+  int32  upvotes   = 3;
+  int32  downvotes = 4;
+}
+
+message GetScoresResponse {
+  repeated PostScore scores = 1;
+}
+
+message UserVoteResponse {
+  bool  voted = 1;
+  int32 value = 2; // 1, -1, or 0 if not voted
+}
