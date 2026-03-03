@@ -9,19 +9,87 @@ services:
     build:
       context: ./services/feed-service
       dockerfile: Dockerfile
+    depends_on:
+      - user-service
+      - post-service
+      - subreddit-service
+      - vote-service
   user-service:
     build:
       context: ./services/user-service
       dockerfile: Dockerfile
+    depends_on:
+      - user-service-db
   post-service:
     build:
       context: ./services/post-service
       dockerfile: Dockerfile
+    depends_on:
+      - post-service-db
   subreddit-service:
     build:
       context: ./services/subreddit-service
       dockerfile: Dockerfile
+    depends_on:
+      - subreddit-service-db
   vote-service:
     build:
       context: ./services/vote-service
       dockerfile: Dockerfile
+    depends_on:
+      - vote-service-db
+
+  user-service-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: user_service
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - user_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  post-service-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: post_service
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - post_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  subreddit-service-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: subreddit_service
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - subreddit_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  vote-service-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: vote_service
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - vote_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  user_db_data:
+  post_db_data:
+  subreddit_db_data:
+  vote_db_data:
