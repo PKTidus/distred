@@ -1,0 +1,27 @@
+services:
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+  feed-service:
+    build:
+      context: ./services/feed-service
+      dockerfile: Dockerfile
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+  post-service:
+    build:
+      context: ./services/post-service
+      dockerfile: Dockerfile
+  subreddit-service:
+    build:
+      context: ./services/subreddit-service
+      dockerfile: Dockerfile
+  vote-service:
+    build:
+      context: ./services/vote-service
+      dockerfile: Dockerfile
