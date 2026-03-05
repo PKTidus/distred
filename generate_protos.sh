@@ -20,15 +20,14 @@ generate_proto() {
     python3 -m grpc_tools.protoc \
         -I$PROTO_SRC \
         --python_out=$DEST_DIR \
+        --pyi_out=$DEST_DIR \
         --grpc_python_out=$DEST_DIR \
         $PROTO_SRC/$FILE_NAME.proto
 
     # B. Fix imports: absolute -> relative to avoid ModuleNotFoundError
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' 's/^import.*_pb2/from . \0/' $DEST_DIR/*_pb2_grpc.py
-    else
-        sed -i 's/^import.*_pb2/from . \0/' $DEST_DIR/*_pb2_grpc.py
-    fi
+    sed -i.bak 's/^import \(.*_pb2\)/from . import \1/' $DEST_DIR/*_pb2_grpc.py
+    rm -f $DEST_DIR/*_pb2_grpc.py.bak
+
 
     # C. Ensure directory is a Python package
     touch $DEST_DIR/__init__.py
@@ -58,5 +57,8 @@ generate_proto "feed" "./services/api-gateway/generated"
 generate_proto "subreddit" "./services/subreddit-service/generated"
 generate_proto "subreddit" "./services/api-gateway/generated"
 generate_proto "subreddit" "./services/post-service/generated"
+
+# health-check.proto -> api-gateway (server) + health-check-service (client)
+generate_proto "health-check" "./services/api-gateway/generated"
 
 echo "Done! Protos generated and imports fixed."

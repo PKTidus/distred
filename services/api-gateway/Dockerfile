@@ -8,9 +8,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+
 EXPOSE 5000
+EXPOSE 8000
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "60", "server:app"]
+CMD ["./run_all.sh"]

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package healthcheck;
+
+// Simple health check service to monitor CPU and memory usage of each api gateway instance.
+service HealthCheckService {
+    // Returns current CPU and memory usage percentages for the instance.
+    rpc Check (HealthCheckRequest) returns (HealthCheckResponse);
+}
+message HealthCheckRequest {
+    // No fields needed for a simple health check
+}
+// Response includes CPU and memory usage as percentages (0.0 - 100.0).
+message HealthCheckResponse {
+    double cpu_usage    = 1; // percentage (0.0 - 100.0)
+    double memory_usage = 2; // percentage (0.0 - 100.0)
+}
