@@ -37,26 +37,26 @@ class UserServiceStub(object):
         self.Register = channel.unary_unary(
                 '/user.UserService/Register',
                 request_serializer=user__pb2.RegisterRequest.SerializeToString,
-                response_deserializer=user__pb2.AuthResponse.FromString,
+                response_deserializer=user__pb2.RegisterResponse.FromString,
                 _registered_method=True)
         self.Login = channel.unary_unary(
                 '/user.UserService/Login',
                 request_serializer=user__pb2.LoginRequest.SerializeToString,
-                response_deserializer=user__pb2.AuthResponse.FromString,
+                response_deserializer=user__pb2.LoginResponse.FromString,
                 _registered_method=True)
         self.Logout = channel.unary_unary(
                 '/user.UserService/Logout',
                 request_serializer=user__pb2.LogoutRequest.SerializeToString,
                 response_deserializer=user__pb2.LogoutResponse.FromString,
                 _registered_method=True)
-        self.ValidateSession = channel.unary_unary(
-                '/user.UserService/ValidateSession',
-                request_serializer=user__pb2.ValidateRequest.SerializeToString,
-                response_deserializer=user__pb2.ValidateResponse.FromString,
+        self.ValidateToken = channel.unary_unary(
+                '/user.UserService/ValidateToken',
+                request_serializer=user__pb2.ValidateTokenRequest.SerializeToString,
+                response_deserializer=user__pb2.ValidateTokenResponse.FromString,
                 _registered_method=True)
-        self.GetUser = channel.unary_unary(
-                '/user.UserService/GetUser',
-                request_serializer=user__pb2.GetUserRequest.SerializeToString,
+        self.GetCurrentUser = channel.unary_unary(
+                '/user.UserService/GetCurrentUser',
+                request_serializer=user__pb2.GetCurrentUserRequest.SerializeToString,
                 response_deserializer=user__pb2.UserResponse.FromString,
                 _registered_method=True)
 
@@ -82,15 +82,14 @@ class UserServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ValidateSession(self, request, context):
+    def ValidateToken(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetUser(self, request, context):
-        """for profile / display
-        """
+    def GetCurrentUser(self, request, context):
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -101,26 +100,26 @@ def add_UserServiceServicer_to_server(servicer, server):
             'Register': grpc.unary_unary_rpc_method_handler(
                     servicer.Register,
                     request_deserializer=user__pb2.RegisterRequest.FromString,
-                    response_serializer=user__pb2.AuthResponse.SerializeToString,
+                    response_serializer=user__pb2.RegisterResponse.SerializeToString,
             ),
             'Login': grpc.unary_unary_rpc_method_handler(
                     servicer.Login,
                     request_deserializer=user__pb2.LoginRequest.FromString,
-                    response_serializer=user__pb2.AuthResponse.SerializeToString,
+                    response_serializer=user__pb2.LoginResponse.SerializeToString,
             ),
             'Logout': grpc.unary_unary_rpc_method_handler(
                     servicer.Logout,
                     request_deserializer=user__pb2.LogoutRequest.FromString,
                     response_serializer=user__pb2.LogoutResponse.SerializeToString,
             ),
-            'ValidateSession': grpc.unary_unary_rpc_method_handler(
-                    servicer.ValidateSession,
-                    request_deserializer=user__pb2.ValidateRequest.FromString,
-                    response_serializer=user__pb2.ValidateResponse.SerializeToString,
+            'ValidateToken': grpc.unary_unary_rpc_method_handler(
+                    servicer.ValidateToken,
+                    request_deserializer=user__pb2.ValidateTokenRequest.FromString,
+                    response_serializer=user__pb2.ValidateTokenResponse.SerializeToString,
             ),
-            'GetUser': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetUser,
-                    request_deserializer=user__pb2.GetUserRequest.FromString,
+            'GetCurrentUser': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetCurrentUser,
+                    request_deserializer=user__pb2.GetCurrentUserRequest.FromString,
                     response_serializer=user__pb2.UserResponse.SerializeToString,
             ),
     }
@@ -150,7 +149,7 @@ class UserService(object):
             target,
             '/user.UserService/Register',
             user__pb2.RegisterRequest.SerializeToString,
-            user__pb2.AuthResponse.FromString,
+            user__pb2.RegisterResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -177,7 +176,7 @@ class UserService(object):
             target,
             '/user.UserService/Login',
             user__pb2.LoginRequest.SerializeToString,
-            user__pb2.AuthResponse.FromString,
+            user__pb2.LoginResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -216,7 +215,7 @@ class UserService(object):
             _registered_method=True)
 
     @staticmethod
-    def ValidateSession(request,
+    def ValidateToken(request,
             target,
             options=(),
             channel_credentials=None,
@@ -229,9 +228,9 @@ class UserService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/user.UserService/ValidateSession',
-            user__pb2.ValidateRequest.SerializeToString,
-            user__pb2.ValidateResponse.FromString,
+            '/user.UserService/ValidateToken',
+            user__pb2.ValidateTokenRequest.SerializeToString,
+            user__pb2.ValidateTokenResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -243,7 +242,7 @@ class UserService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetUser(request,
+    def GetCurrentUser(request,
             target,
             options=(),
             channel_credentials=None,
@@ -256,8 +255,8 @@ class UserService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/user.UserService/GetUser',
-            user__pb2.GetUserRequest.SerializeToString,
+            '/user.UserService/GetCurrentUser',
+            user__pb2.GetCurrentUserRequest.SerializeToString,
             user__pb2.UserResponse.FromString,
             options,
             channel_credentials,

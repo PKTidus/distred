@@ -3,16 +3,20 @@ syntax = "proto3";
 package user;
 
 service UserService {
-  rpc Register        (RegisterRequest)  returns (AuthResponse);
-  rpc Login           (LoginRequest)     returns (AuthResponse);
-  rpc Logout          (LogoutRequest)    returns (LogoutResponse);
-  rpc ValidateSession (ValidateRequest)  returns (ValidateResponse);
-  rpc GetUser         (GetUserRequest)   returns (UserResponse);   // for profile / display
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc GetCurrentUser (GetCurrentUserRequest) returns (UserResponse);
 }
 
 message RegisterRequest {
   string username = 1;
   string password = 2;
+}
+message RegisterResponse {
+  bool success = 1;
+  string error = 2;
 }
 
 message LoginRequest {
@@ -20,37 +24,36 @@ message LoginRequest {
   string password = 2;
 }
 
+message LoginResponse {
+  string access_token = 1;
+  string token_type = 2;
+  string error = 3;
+}
+
 message LogoutRequest {
   string token = 1;
 }
+message LogoutResponse {
+  bool success = 1;
+  string error = 2;
+}
 
-message ValidateRequest {
+message ValidateTokenRequest {
   string token = 1;
 }
 
-message GetUserRequest {
-  string user_id = 1;
-}
-
-message AuthResponse {
-  string user_id  = 1;
+message ValidateTokenResponse {
+  bool valid = 1;
   string username = 2;
-  string token    = 3;
-  int64  expires  = 4;
+  string error = 3;
 }
 
-message LogoutResponse {
-  bool success = 1;
-}
-
-message ValidateResponse {
-  bool   valid    = 1;
-  string user_id  = 2;
-  string username = 3;
+message GetCurrentUserRequest {
+  string token = 1;
 }
 
 message UserResponse {
-  string user_id    = 1;
-  string username   = 2;
-  int64  created_at = 3;
+  int32 id = 1;
+  string username = 2;
+  string error = 3;
 }

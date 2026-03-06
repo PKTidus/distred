@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\x12\x04user\"5\n\x0fRegisterRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"2\n\x0cLoginRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"\x1e\n\rLogoutRequest\x12\r\n\x05token\x18\x01 \x01(\t\" \n\x0fValidateRequest\x12\r\n\x05token\x18\x01 \x01(\t\"!\n\x0eGetUserRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\t\"Q\n\x0c\x41uthResponse\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05token\x18\x03 \x01(\t\x12\x0f\n\x07\x65xpires\x18\x04 \x01(\x03\"!\n\x0eLogoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"D\n\x10ValidateResponse\x12\r\n\x05valid\x18\x01 \x01(\x08\x12\x0f\n\x07user_id\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\"E\n\x0cUserResponse\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x12\n\ncreated_at\x18\x03 \x01(\x03\x32\xa1\x02\n\x0bUserService\x12\x35\n\x08Register\x12\x15.user.RegisterRequest\x1a\x12.user.AuthResponse\x12/\n\x05Login\x12\x12.user.LoginRequest\x1a\x12.user.AuthResponse\x12\x33\n\x06Logout\x12\x13.user.LogoutRequest\x1a\x14.user.LogoutResponse\x12@\n\x0fValidateSession\x12\x15.user.ValidateRequest\x1a\x16.user.ValidateResponse\x12\x33\n\x07GetUser\x12\x14.user.GetUserRequest\x1a\x12.user.UserResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\x12\x04user\"5\n\x0fRegisterRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"2\n\x10RegisterResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"2\n\x0cLoginRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"H\n\rLoginResponse\x12\x14\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\t\x12\x12\n\ntoken_type\x18\x02 \x01(\t\x12\r\n\x05\x65rror\x18\x03 \x01(\t\"\x1e\n\rLogoutRequest\x12\r\n\x05token\x18\x01 \x01(\t\"0\n\x0eLogoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"%\n\x14ValidateTokenRequest\x12\r\n\x05token\x18\x01 \x01(\t\"G\n\x15ValidateTokenResponse\x12\r\n\x05valid\x18\x01 \x01(\x08\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65rror\x18\x03 \x01(\t\"&\n\x15GetCurrentUserRequest\x12\r\n\x05token\x18\x01 \x01(\t\";\n\x0cUserResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65rror\x18\x03 \x01(\t2\xbc\x02\n\x0bUserService\x12\x39\n\x08Register\x12\x15.user.RegisterRequest\x1a\x16.user.RegisterResponse\x12\x30\n\x05Login\x12\x12.user.LoginRequest\x1a\x13.user.LoginResponse\x12\x33\n\x06Logout\x12\x13.user.LogoutRequest\x1a\x14.user.LogoutResponse\x12H\n\rValidateToken\x12\x1a.user.ValidateTokenRequest\x1a\x1b.user.ValidateTokenResponse\x12\x41\n\x0eGetCurrentUser\x12\x1b.user.GetCurrentUserRequest\x1a\x12.user.UserResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,22 +33,24 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_REGISTERREQUEST']._serialized_start=20
   _globals['_REGISTERREQUEST']._serialized_end=73
-  _globals['_LOGINREQUEST']._serialized_start=75
-  _globals['_LOGINREQUEST']._serialized_end=125
-  _globals['_LOGOUTREQUEST']._serialized_start=127
-  _globals['_LOGOUTREQUEST']._serialized_end=157
-  _globals['_VALIDATEREQUEST']._serialized_start=159
-  _globals['_VALIDATEREQUEST']._serialized_end=191
-  _globals['_GETUSERREQUEST']._serialized_start=193
-  _globals['_GETUSERREQUEST']._serialized_end=226
-  _globals['_AUTHRESPONSE']._serialized_start=228
-  _globals['_AUTHRESPONSE']._serialized_end=309
-  _globals['_LOGOUTRESPONSE']._serialized_start=311
-  _globals['_LOGOUTRESPONSE']._serialized_end=344
-  _globals['_VALIDATERESPONSE']._serialized_start=346
-  _globals['_VALIDATERESPONSE']._serialized_end=414
-  _globals['_USERRESPONSE']._serialized_start=416
-  _globals['_USERRESPONSE']._serialized_end=485
-  _globals['_USERSERVICE']._serialized_start=488
-  _globals['_USERSERVICE']._serialized_end=777
+  _globals['_REGISTERRESPONSE']._serialized_start=75
+  _globals['_REGISTERRESPONSE']._serialized_end=125
+  _globals['_LOGINREQUEST']._serialized_start=127
+  _globals['_LOGINREQUEST']._serialized_end=177
+  _globals['_LOGINRESPONSE']._serialized_start=179
+  _globals['_LOGINRESPONSE']._serialized_end=251
+  _globals['_LOGOUTREQUEST']._serialized_start=253
+  _globals['_LOGOUTREQUEST']._serialized_end=283
+  _globals['_LOGOUTRESPONSE']._serialized_start=285
+  _globals['_LOGOUTRESPONSE']._serialized_end=333
+  _globals['_VALIDATETOKENREQUEST']._serialized_start=335
+  _globals['_VALIDATETOKENREQUEST']._serialized_end=372
+  _globals['_VALIDATETOKENRESPONSE']._serialized_start=374
+  _globals['_VALIDATETOKENRESPONSE']._serialized_end=445
+  _globals['_GETCURRENTUSERREQUEST']._serialized_start=447
+  _globals['_GETCURRENTUSERREQUEST']._serialized_end=485
+  _globals['_USERRESPONSE']._serialized_start=487
+  _globals['_USERRESPONSE']._serialized_end=546
+  _globals['_USERSERVICE']._serialized_start=549
+  _globals['_USERSERVICE']._serialized_end=865
 # @@protoc_insertion_point(module_scope)
