@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nfeed.proto\x12\x04\x66\x65\x65\x64\"P\n\x0b\x46\x65\x65\x64Request\x12\x11\n\tsubreddit\x18\x01 \x01(\t\x12\r\n\x05limit\x18\x02 \x01(\x05\x12\x0e\n\x06offset\x18\x03 \x01(\x05\x12\x0f\n\x07user_id\x18\x04 \x01(\t\"\xca\x01\n\x08\x46\x65\x65\x64Item\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0c\n\x04\x62ody\x18\x03 \x01(\t\x12\x11\n\tsubreddit\x18\x04 \x01(\t\x12\x11\n\tauthor_id\x18\x05 \x01(\t\x12\x10\n\x08username\x18\x06 \x01(\t\x12\r\n\x05score\x18\x07 \x01(\x05\x12\x0f\n\x07upvotes\x18\x08 \x01(\x05\x12\x11\n\tdownvotes\x18\t \x01(\x05\x12\x11\n\tuser_vote\x18\n \x01(\x05\x12\x12\n\ncreated_at\x18\x0b \x01(\x03\"<\n\x0c\x46\x65\x65\x64Response\x12\x1d\n\x05items\x18\x01 \x03(\x0b\x32\x0e.feed.FeedItem\x12\r\n\x05total\x18\x02 \x01(\x05\x32~\n\x0b\x46\x65\x65\x64Service\x12\x34\n\x0bGetHomeFeed\x12\x11.feed.FeedRequest\x1a\x12.feed.FeedResponse\x12\x39\n\x10GetSubredditFeed\x12\x11.feed.FeedRequest\x1a\x12.feed.FeedResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nfeed.proto\x12\x04\x66\x65\x65\x64\"^\n\x0b\x46\x65\x65\x64Request\x12\x0c\n\x04sort\x18\x01 \x01(\t\x12\x11\n\tsubreddit\x18\x02 \x01(\t\x12\r\n\x05limit\x18\x03 \x01(\x05\x12\x0e\n\x06offset\x18\x04 \x01(\x05\x12\x0f\n\x07user_id\x18\x05 \x01(\x05\"\x85\x01\n\x08\x46\x65\x65\x64Item\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x11\n\tsubreddit\x18\x03 \x01(\t\x12\x10\n\x08username\x18\x04 \x01(\t\x12\r\n\x05score\x18\x05 \x01(\x05\x12\x11\n\tuser_vote\x18\x06 \x01(\x05\x12\x12\n\ncreated_at\x18\x07 \x01(\x03\"<\n\x0c\x46\x65\x65\x64Response\x12\x1d\n\x05items\x18\x01 \x03(\x0b\x32\x0e.feed.FeedItem\x12\r\n\x05total\x18\x02 \x01(\x05\x32~\n\x0b\x46\x65\x65\x64Service\x12\x34\n\x0bGetHomeFeed\x12\x11.feed.FeedRequest\x1a\x12.feed.FeedResponse\x12\x39\n\x10GetSubredditFeed\x12\x11.feed.FeedRequest\x1a\x12.feed.FeedResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,11 +32,11 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'feed_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_FEEDREQUEST']._serialized_start=20
-  _globals['_FEEDREQUEST']._serialized_end=100
-  _globals['_FEEDITEM']._serialized_start=103
-  _globals['_FEEDITEM']._serialized_end=305
-  _globals['_FEEDRESPONSE']._serialized_start=307
-  _globals['_FEEDRESPONSE']._serialized_end=367
-  _globals['_FEEDSERVICE']._serialized_start=369
-  _globals['_FEEDSERVICE']._serialized_end=495
+  _globals['_FEEDREQUEST']._serialized_end=114
+  _globals['_FEEDITEM']._serialized_start=117
+  _globals['_FEEDITEM']._serialized_end=250
+  _globals['_FEEDRESPONSE']._serialized_start=252
+  _globals['_FEEDRESPONSE']._serialized_end=312
+  _globals['_FEEDSERVICE']._serialized_start=314
+  _globals['_FEEDSERVICE']._serialized_end=440
 # @@protoc_insertion_point(module_scope)

@@ -21,14 +21,14 @@ class ListSubredditsRequest(_message.Message):
     def __init__(self, limit: _Optional[int] = ..., offset: _Optional[int] = ...) -> None: ...
 
 class CreateSubredditRequest(_message.Message):
-    __slots__ = ("name", "description", "created_by")
+    __slots__ = ("name", "description", "user_id")
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
-    CREATED_BY_FIELD_NUMBER: _ClassVar[int]
+    USER_ID_FIELD_NUMBER: _ClassVar[int]
     name: str
     description: str
-    created_by: str
-    def __init__(self, name: _Optional[str] = ..., description: _Optional[str] = ..., created_by: _Optional[str] = ...) -> None: ...
+    user_id: int
+    def __init__(self, name: _Optional[str] = ..., description: _Optional[str] = ..., user_id: _Optional[int] = ...) -> None: ...
 
 class SubredditResponse(_message.Message):
     __slots__ = ("subreddit_id", "name", "description", "created_by", "created_at")

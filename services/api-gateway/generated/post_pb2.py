@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\npost.proto\x12\x04post\"H\n\x11\x43reatePostRequest\x12\r\n\x05title\x18\x01 \x01(\t\x12\x11\n\tsubreddit\x18\x02 \x01(\t\x12\x11\n\tauthor_id\x18\x03 \x01(\t\"!\n\x0eGetPostRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\"D\n\x10ListPostsRequest\x12\x11\n\tsubreddit\x18\x01 \x01(\t\x12\r\n\x05limit\x18\x02 \x01(\x05\x12\x0e\n\x06offset\x18\x03 \x01(\x05\"7\n\x11\x44\x65letePostRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x11\n\tauthor_id\x18\x02 \x01(\t\"z\n\x0cPostResponse\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x11\n\tsubreddit\x18\x04 \x01(\t\x12\x11\n\tauthor_id\x18\x05 \x01(\t\x12\x10\n\x08username\x18\x06 \x01(\t\x12\x12\n\ncreated_at\x18\x07 \x01(\x03\"E\n\x11ListPostsResponse\x12!\n\x05posts\x18\x01 \x03(\x0b\x32\x12.post.PostResponse\x12\r\n\x05total\x18\x02 \x01(\x05\"%\n\x12\x44\x65letePostResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x32\xfc\x01\n\x0bPostService\x12\x39\n\nCreatePost\x12\x17.post.CreatePostRequest\x1a\x12.post.PostResponse\x12\x33\n\x07GetPost\x12\x14.post.GetPostRequest\x1a\x12.post.PostResponse\x12<\n\tListPosts\x12\x16.post.ListPostsRequest\x1a\x17.post.ListPostsResponse\x12?\n\nDeletePost\x12\x17.post.DeletePostRequest\x1a\x18.post.DeletePostResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\npost.proto\x12\x04post\"H\n\x11\x43reatePostRequest\x12\r\n\x05title\x18\x01 \x01(\t\x12\x11\n\tsubreddit\x18\x02 \x01(\t\x12\x11\n\tauthor_id\x18\x03 \x01(\x05\"2\n\x0eGetPostRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\"U\n\x10ListPostsRequest\x12\x11\n\tsubreddit\x18\x01 \x01(\t\x12\r\n\x05limit\x18\x02 \x01(\x05\x12\x0e\n\x06offset\x18\x03 \x01(\x05\x12\x0f\n\x07user_id\x18\x04 \x01(\x05\"7\n\x11\x44\x65letePostRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x11\n\tauthor_id\x18\x02 \x01(\x05\"\xab\x01\n\x0cPostResponse\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x11\n\tsubreddit\x18\x03 \x01(\t\x12\x11\n\tauthor_id\x18\x04 \x01(\x05\x12\x10\n\x08username\x18\x05 \x01(\t\x12\r\n\x05score\x18\x06 \x01(\x05\x12\x11\n\tuser_vote\x18\x07 \x01(\x05\x12\x12\n\ncreated_at\x18\x08 \x01(\x03\x12\r\n\x05\x65rror\x18\t \x01(\t\"E\n\x11ListPostsResponse\x12!\n\x05posts\x18\x01 \x03(\x0b\x32\x12.post.PostResponse\x12\r\n\x05total\x18\x02 \x01(\x05\"4\n\x12\x44\x65letePostResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\r\n\x05\x65rror\x18\x02 \x01(\t2\xfc\x01\n\x0bPostService\x12\x39\n\nCreatePost\x12\x17.post.CreatePostRequest\x1a\x12.post.PostResponse\x12\x33\n\x07GetPost\x12\x14.post.GetPostRequest\x1a\x12.post.PostResponse\x12<\n\tListPosts\x12\x16.post.ListPostsRequest\x1a\x17.post.ListPostsResponse\x12?\n\nDeletePost\x12\x17.post.DeletePostRequest\x1a\x18.post.DeletePostResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,17 +34,17 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_CREATEPOSTREQUEST']._serialized_start=20
   _globals['_CREATEPOSTREQUEST']._serialized_end=92
   _globals['_GETPOSTREQUEST']._serialized_start=94
-  _globals['_GETPOSTREQUEST']._serialized_end=127
-  _globals['_LISTPOSTSREQUEST']._serialized_start=129
-  _globals['_LISTPOSTSREQUEST']._serialized_end=197
-  _globals['_DELETEPOSTREQUEST']._serialized_start=199
-  _globals['_DELETEPOSTREQUEST']._serialized_end=254
-  _globals['_POSTRESPONSE']._serialized_start=256
-  _globals['_POSTRESPONSE']._serialized_end=378
-  _globals['_LISTPOSTSRESPONSE']._serialized_start=380
-  _globals['_LISTPOSTSRESPONSE']._serialized_end=449
-  _globals['_DELETEPOSTRESPONSE']._serialized_start=451
-  _globals['_DELETEPOSTRESPONSE']._serialized_end=488
-  _globals['_POSTSERVICE']._serialized_start=491
-  _globals['_POSTSERVICE']._serialized_end=743
+  _globals['_GETPOSTREQUEST']._serialized_end=144
+  _globals['_LISTPOSTSREQUEST']._serialized_start=146
+  _globals['_LISTPOSTSREQUEST']._serialized_end=231
+  _globals['_DELETEPOSTREQUEST']._serialized_start=233
+  _globals['_DELETEPOSTREQUEST']._serialized_end=288
+  _globals['_POSTRESPONSE']._serialized_start=291
+  _globals['_POSTRESPONSE']._serialized_end=462
+  _globals['_LISTPOSTSRESPONSE']._serialized_start=464
+  _globals['_LISTPOSTSRESPONSE']._serialized_end=533
+  _globals['_DELETEPOSTRESPONSE']._serialized_start=535
+  _globals['_DELETEPOSTRESPONSE']._serialized_end=587
+  _globals['_POSTSERVICE']._serialized_start=590
+  _globals['_POSTSERVICE']._serialized_end=842
 # @@protoc_insertion_point(module_scope)

@@ -3,32 +3,29 @@ syntax = "proto3";
 package feed;
 
 service FeedService {
-  rpc GetHomeFeed       (FeedRequest)  returns (FeedResponse);
-  rpc GetSubredditFeed  (FeedRequest)  returns (FeedResponse);
+  rpc GetHomeFeed      (FeedRequest) returns (FeedResponse);
+  rpc GetSubredditFeed (FeedRequest) returns (FeedResponse);
 }
 
 message FeedRequest {
-  string subreddit = 1; // empty for home feed
-  int32  limit     = 2;
-  int32  offset    = 3;
-  string user_id   = 4; // optional, used to populate user_vote on each item
+  string sort = 1; // "hot" | "new" | "top"
+  string subreddit = 2; // empty for home feed
+  int32 limit = 3;
+  int32 offset = 4;
+  int32 user_id = 5; // 0 if unauthenticated
 }
 
 message FeedItem {
-  string post_id    = 1;
-  string title      = 2;
-  string body       = 3;
-  string subreddit  = 4;
-  string author_id  = 5;
-  string username   = 6;
-  int32  score      = 7;
-  int32  upvotes    = 8;
-  int32  downvotes  = 9;
-  int32  user_vote  = 10; // 1, -1, or 0
-  int64  created_at = 11;
+  string post_id = 1;
+  string title = 2;
+  string subreddit = 3;
+  string username = 4;
+  int32 score = 5;
+  int32 user_vote = 6; // 1, -1, or 0
+  int64 created_at = 7;
 }
 
 message FeedResponse {
   repeated FeedItem items = 1;
-  int32             total = 2;
+  int32 total = 2;
 }

@@ -20,7 +20,7 @@ message ListSubredditsRequest {
 message CreateSubredditRequest {
   string name        = 1;
   string description = 2;
-  string created_by  = 3;
+  int32  user_id     = 3;
 }
 
 message SubredditResponse {

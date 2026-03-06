@@ -13,48 +13,58 @@ class CreatePostRequest(_message.Message):
     AUTHOR_ID_FIELD_NUMBER: _ClassVar[int]
     title: str
     subreddit: str
-    author_id: str
-    def __init__(self, title: _Optional[str] = ..., subreddit: _Optional[str] = ..., author_id: _Optional[str] = ...) -> None: ...
+    author_id: int
+    def __init__(self, title: _Optional[str] = ..., subreddit: _Optional[str] = ..., author_id: _Optional[int] = ...) -> None: ...
 
 class GetPostRequest(_message.Message):
-    __slots__ = ("post_id",)
+    __slots__ = ("post_id", "user_id")
     POST_ID_FIELD_NUMBER: _ClassVar[int]
+    USER_ID_FIELD_NUMBER: _ClassVar[int]
     post_id: str
-    def __init__(self, post_id: _Optional[str] = ...) -> None: ...
+    user_id: int
+    def __init__(self, post_id: _Optional[str] = ..., user_id: _Optional[int] = ...) -> None: ...
 
 class ListPostsRequest(_message.Message):
-    __slots__ = ("subreddit", "limit", "offset")
+    __slots__ = ("subreddit", "limit", "offset", "user_id")
     SUBREDDIT_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     OFFSET_FIELD_NUMBER: _ClassVar[int]
+    USER_ID_FIELD_NUMBER: _ClassVar[int]
     subreddit: str
     limit: int
     offset: int
-    def __init__(self, subreddit: _Optional[str] = ..., limit: _Optional[int] = ..., offset: _Optional[int] = ...) -> None: ...
+    user_id: int
+    def __init__(self, subreddit: _Optional[str] = ..., limit: _Optional[int] = ..., offset: _Optional[int] = ..., user_id: _Optional[int] = ...) -> None: ...
 
 class DeletePostRequest(_message.Message):
     __slots__ = ("post_id", "author_id")
     POST_ID_FIELD_NUMBER: _ClassVar[int]
     AUTHOR_ID_FIELD_NUMBER: _ClassVar[int]
     post_id: str
-    author_id: str
-    def __init__(self, post_id: _Optional[str] = ..., author_id: _Optional[str] = ...) -> None: ...
+    author_id: int
+    def __init__(self, post_id: _Optional[str] = ..., author_id: _Optional[int] = ...) -> None: ...
 
 class PostResponse(_message.Message):
-    __slots__ = ("post_id", "title", "subreddit", "author_id", "username", "created_at")
+    __slots__ = ("post_id", "title", "subreddit", "author_id", "username", "score", "user_vote", "created_at", "error")
     POST_ID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     SUBREDDIT_FIELD_NUMBER: _ClassVar[int]
     AUTHOR_ID_FIELD_NUMBER: _ClassVar[int]
     USERNAME_FIELD_NUMBER: _ClassVar[int]
+    SCORE_FIELD_NUMBER: _ClassVar[int]
+    USER_VOTE_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     post_id: str
     title: str
     subreddit: str
-    author_id: str
+    author_id: int
     username: str
+    score: int
+    user_vote: int
     created_at: int
-    def __init__(self, post_id: _Optional[str] = ..., title: _Optional[str] = ..., subreddit: _Optional[str] = ..., author_id: _Optional[str] = ..., username: _Optional[str] = ..., created_at: _Optional[int] = ...) -> None: ...
+    error: str
+    def __init__(self, post_id: _Optional[str] = ..., title: _Optional[str] = ..., subreddit: _Optional[str] = ..., author_id: _Optional[int] = ..., username: _Optional[str] = ..., score: _Optional[int] = ..., user_vote: _Optional[int] = ..., created_at: _Optional[int] = ..., error: _Optional[str] = ...) -> None: ...
 
 class ListPostsResponse(_message.Message):
     __slots__ = ("posts", "total")
@@ -65,7 +75,9 @@ class ListPostsResponse(_message.Message):
     def __init__(self, posts: _Optional[_Iterable[_Union[PostResponse, _Mapping]]] = ..., total: _Optional[int] = ...) -> None: ...
 
 class DeletePostResponse(_message.Message):
-    __slots__ = ("success",)
+    __slots__ = ("success", "error")
     SUCCESS_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     success: bool
-    def __init__(self, success: bool = ...) -> None: ...
+    error: str
+    def __init__(self, success: bool = ..., error: _Optional[str] = ...) -> None: ...

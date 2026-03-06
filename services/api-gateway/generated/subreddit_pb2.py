@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fsubreddit.proto\x12\tsubreddit\"#\n\x13GetSubredditRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"6\n\x15ListSubredditsRequest\x12\r\n\x05limit\x18\x01 \x01(\x05\x12\x0e\n\x06offset\x18\x02 \x01(\x05\"O\n\x16\x43reateSubredditRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x12\n\ncreated_by\x18\x03 \x01(\t\"t\n\x11SubredditResponse\x12\x14\n\x0csubreddit_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x12\n\ncreated_by\x18\x04 \x01(\t\x12\x12\n\ncreated_at\x18\x05 \x01(\x03\"J\n\x16ListSubredditsResponse\x12\x30\n\nsubreddits\x18\x01 \x03(\x0b\x32\x1c.subreddit.SubredditResponse2\x8b\x02\n\x10SubredditService\x12L\n\x0cGetSubreddit\x12\x1e.subreddit.GetSubredditRequest\x1a\x1c.subreddit.SubredditResponse\x12U\n\x0eListSubreddits\x12 .subreddit.ListSubredditsRequest\x1a!.subreddit.ListSubredditsResponse\x12R\n\x0f\x43reateSubreddit\x12!.subreddit.CreateSubredditRequest\x1a\x1c.subreddit.SubredditResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fsubreddit.proto\x12\tsubreddit\"#\n\x13GetSubredditRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"6\n\x15ListSubredditsRequest\x12\r\n\x05limit\x18\x01 \x01(\x05\x12\x0e\n\x06offset\x18\x02 \x01(\x05\"L\n\x16\x43reateSubredditRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x0f\n\x07user_id\x18\x03 \x01(\x05\"t\n\x11SubredditResponse\x12\x14\n\x0csubreddit_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x12\n\ncreated_by\x18\x04 \x01(\t\x12\x12\n\ncreated_at\x18\x05 \x01(\x03\"J\n\x16ListSubredditsResponse\x12\x30\n\nsubreddits\x18\x01 \x03(\x0b\x32\x1c.subreddit.SubredditResponse2\x8b\x02\n\x10SubredditService\x12L\n\x0cGetSubreddit\x12\x1e.subreddit.GetSubredditRequest\x1a\x1c.subreddit.SubredditResponse\x12U\n\x0eListSubreddits\x12 .subreddit.ListSubredditsRequest\x1a!.subreddit.ListSubredditsResponse\x12R\n\x0f\x43reateSubreddit\x12!.subreddit.CreateSubredditRequest\x1a\x1c.subreddit.SubredditResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,11 +36,11 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_LISTSUBREDDITSREQUEST']._serialized_start=67
   _globals['_LISTSUBREDDITSREQUEST']._serialized_end=121
   _globals['_CREATESUBREDDITREQUEST']._serialized_start=123
-  _globals['_CREATESUBREDDITREQUEST']._serialized_end=202
-  _globals['_SUBREDDITRESPONSE']._serialized_start=204
-  _globals['_SUBREDDITRESPONSE']._serialized_end=320
-  _globals['_LISTSUBREDDITSRESPONSE']._serialized_start=322
-  _globals['_LISTSUBREDDITSRESPONSE']._serialized_end=396
-  _globals['_SUBREDDITSERVICE']._serialized_start=399
-  _globals['_SUBREDDITSERVICE']._serialized_end=666
+  _globals['_CREATESUBREDDITREQUEST']._serialized_end=199
+  _globals['_SUBREDDITRESPONSE']._serialized_start=201
+  _globals['_SUBREDDITRESPONSE']._serialized_end=317
+  _globals['_LISTSUBREDDITSRESPONSE']._serialized_start=319
+  _globals['_LISTSUBREDDITSRESPONSE']._serialized_end=393
+  _globals['_SUBREDDITSERVICE']._serialized_start=396
+  _globals['_SUBREDDITSERVICE']._serialized_end=663
 # @@protoc_insertion_point(module_scope)
