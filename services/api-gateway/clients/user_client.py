@@ -15,7 +15,7 @@ def get_stub():
     return user_pb2_grpc.UserServiceStub(get_channel())
 
 
-def grpc_login(username: str, password: str) -> dict:
+def login(username: str, password: str) -> dict:
     stub = get_stub()
     response = stub.Login(user_pb2.LoginRequest(username=username, password=password))
     if response.error:
@@ -23,7 +23,7 @@ def grpc_login(username: str, password: str) -> dict:
     return {"access_token": response.access_token, "token_type": response.token_type}
 
 
-def grpc_register(username: str, password: str) -> dict:
+def register(username: str, password: str) -> dict:
     stub = get_stub()
     response = stub.Register(
         user_pb2.RegisterRequest(username=username, password=password)
@@ -33,7 +33,7 @@ def grpc_register(username: str, password: str) -> dict:
     return {"success": True}
 
 
-def grpc_validate_token(token: str) -> dict:
+def validate_token(token: str) -> dict:
     stub = get_stub()
     response = stub.ValidateToken(user_pb2.ValidateTokenRequest(token=token))
     return {
@@ -43,15 +43,13 @@ def grpc_validate_token(token: str) -> dict:
     }
 
 
-def grpc_get_current_user(token: str) -> dict:
+def get_current_user(token: str) -> user_pb2.UserResponse:
     stub = get_stub()
     response = stub.GetCurrentUser(user_pb2.GetCurrentUserRequest(token=token))
-    if response.error:
-        return {"error": response.error}
-    return {"id": response.id, "name": response.name, "username": response.username}
+    return response
 
 
-def grpc_logout(token: str) -> dict:
+def logout(token: str) -> dict:
     stub = get_stub()
     response = stub.Logout(user_pb2.LogoutRequest(token=token))
     if not response.success:

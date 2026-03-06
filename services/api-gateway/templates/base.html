@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Forum{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('pages.home') }}">Home</a></li>
+            <li><a href="{{ url_for('pages.topics') }}">Topics</a></li>
+        </ul>
+
+        {% if session.token %}
+        <div class="user-info">
+            Welcome, {{ g.username }}!
+            <a href="{{ url_for('pages.create_post') }}">+ Post</a>
+            <form method="POST" action="{{ url_for('auth.logout') }}">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="login-prompt">
+            <a href="{{ url_for('auth.login') }}">Login</a>
+            <a href="{{ url_for('auth.register') }}">Register</a>
+        </div>
+        {% endif %}
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+
+</html>

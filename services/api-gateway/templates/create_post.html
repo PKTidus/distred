@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Create Post{% endblock %}
+
+{% block content %}
+<form method="post">
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+    </div>
+    <div>
+        <label for="subreddit">Subreddit:</label>
+        <select id="subreddit" name="subreddit" required>
+            <option value="">Select a subreddit</option>
+            {% for subreddit in subreddits %}
+            <option value="{{ subreddit.name }}">{{ subreddit.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit">Create Post</button>
+</form>
+{% endblock %}

@@ -49,11 +49,7 @@ def _token_ttl_seconds(token: str) -> int | None:
         return None
 
 
-def extract_bearer_token() -> str | None:
-    auth_header = request.headers.get("Authorization", "")
-    if auth_header.startswith("Bearer "):
-        return auth_header[len("Bearer ") :]
-    return None
+
 
 
 # ---------------------------------------------------------------------------

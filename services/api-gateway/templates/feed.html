@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% if title %}
+    {% block title %}{{ title }}{% endblock %}
+{% else %}
+    {% block title %}Home{% endblock %}
+{% endif %}
+{% block content %}
+
+<div class="feed-layout">
+
+    {# ── MAIN FEED ── #}
+    <section class="feed">
+        {# ── SORTING ── #}
+        <div class="sort-controls">
+            <label for="sort-select">Sort by:</label>
+            <select id="sort-select" onchange="window.location.href = '?sort=' + this.value + '&page=1'">
+                <option value="hot" {% if sort == 'hot' %}selected{% endif %}>Hot</option>
+                <option value="top" {% if sort == 'top' %}selected{% endif %}>Top</option>
+                <option value="new" {% if sort == 'new' %}selected{% endif %}>New</option>
+            </select>
+        </div>
+        {% if posts %}
+        <div class="feed-list">
+            {% for post in posts %}
+            {% include "feed_item.html" %}
+            {% endfor %}
+        </div>
+
+        {# ── PAGINATION ── #}
+        {% if total_pages > 1 %}
+        <nav class="pagination" aria-label="Feed pages">
+            {% if page > 1 %}
+            <a class="page-btn" href="?sort={{ sort }}&page={{ page - 1 }}">← Prev</a>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+            <a class="page-btn {% if p == page %}active{% endif %}" href="?sort={{ sort }}&page={{ p }}">{{ p }}</a>
+            {% endfor %}
+
+            {% if page < total_pages %} <a class="page-btn" href="?sort={{ sort }}&page={{ page + 1 }}">Next →</a>
+                {% endif %}
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="feed-empty">
+            <p>No posts yet.</p>
+            {% if session.token %}
+            <a href="{{ url_for('posts.create_post') }}">Be the first to post</a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}">Log in to post</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </section>
+</div>
+
+{% endblock %}
