@@ -49,3 +49,11 @@ def grpc_get_current_user(token: str) -> dict:
     if response.error:
         return {"error": response.error}
     return {"id": response.id, "name": response.name, "username": response.username}
+
+
+def grpc_logout(token: str) -> dict:
+    stub = get_stub()
+    response = stub.Logout(user_pb2.LogoutRequest(token=token))
+    if not response.success:
+        return {"error": response.error}
+    return {"success": True}
