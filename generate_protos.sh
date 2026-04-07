@@ -32,6 +32,20 @@ generate_proto() {
     # C. Ensure directory is a Python package
     touch $DEST_DIR/__init__.py
 }
+generate_go_proto() {
+    FILE_NAME=$1
+    DEST_DIR=$2
+
+    echo "Generating Go proto for $FILE_NAME in $DEST_DIR..."
+
+    mkdir -p "$DEST_DIR"
+
+    protoc \
+        -I"$PROTO_SRC" \
+        --go_out="$DEST_DIR" --go_opt=paths=source_relative \
+        --go-grpc_out="$DEST_DIR" --go-grpc_opt=paths=source_relative \
+        "$PROTO_SRC/$FILE_NAME.proto"
+}
 
 # --- Services and their proto dependencies ---
 
@@ -60,5 +74,8 @@ generate_proto "subreddit" "./services/post-service/generated"
 
 # health-check.proto -> api-gateway (server) + health-check-service (client)
 generate_proto "health-check" "./services/api-gateway/generated"
+
+# health-check.proto -> health-check-service (server)
+generate_go_proto "health-check" "./services/load-balancer/generated"
 
 echo "Done! Protos generated and imports fixed."
