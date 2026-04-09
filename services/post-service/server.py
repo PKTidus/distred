@@ -49,6 +49,17 @@ class PostService(post_pb2_grpc.PostServiceServicer):
             db.refresh(post)
 
             username = self._get_username(post.author_id)
+            
+            # Automatically upvote
+            try:
+                vote_stub = self._get_vote_stub()
+                vote_stub.CastVote(vote_pb2.CastVoteRequest(
+                    post_id=str(post.id),
+                    user_id=str(post.author_id),
+                    value=1
+                ))
+            except Exception:
+                pass
 
             return post_pb2.PostResponse(
                 post_id=str(post.id),
@@ -56,8 +67,8 @@ class PostService(post_pb2_grpc.PostServiceServicer):
                 subreddit=post.subreddit,
                 author_id=post.author_id,
                 username=username,
-                score=0,
-                user_vote=0,
+                score=1,
+                user_vote=1,
                 created_at=post.created_at,
             )
         except Exception as e:
