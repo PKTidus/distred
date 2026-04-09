@@ -28,7 +28,6 @@ class UserService(user_pb2_grpc.UserServiceServicer):
                     success=False, error="Username already exists"
                 )
             user = User(
-                name=request.name,
                 username=request.username,
                 hashed_password=get_password_hash(request.password),
             )

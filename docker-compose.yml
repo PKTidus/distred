@@ -5,19 +5,39 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:8000
-      - 5555:5000
     depends_on:
       - feed-service
+      - user-service
+      - post-service
+      - subreddit-service
+      - vote-service
       - gateway-cache
+    environment:
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=5000
+      - POST_SERVICE_HOST=post-service
+      - POST_SERVICE_PORT=5000
+      - SUBREDDIT_SERVICE_HOST=subreddit-service
+      - SUBREDDIT_SERVICE_PORT=5000
+      - VOTE_SERVICE_HOST=vote-service
+      - VOTE_SERVICE_PORT=5000
+      - FEED_SERVICE_HOST=feed-service
+      - FEED_SERVICE_PORT=5000
+      - REDIS_HOST=gateway-cache
+      - REDIS_PORT=6379
+      - SECRET_KEY=dev-secret-key
+
   feed-service:
     build:
       context: ./services/feed-service
       dockerfile: Dockerfile
     depends_on:
-      - user-service
       - post-service
-      - subreddit-service
-      - vote-service
+    environment:
+      - POST_SERVICE_HOST=post-service
+      - POST_SERVICE_PORT=5000
+      - PORT=5000
+
   user-service:
     build:
       context: ./services/user-service
@@ -29,17 +49,26 @@ services:
       - DB_NAME=user_service
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - PORT=5000
+
   post-service:
     build:
       context: ./services/post-service
       dockerfile: Dockerfile
     depends_on:
       - post-service-db
+      - user-service
+      - vote-service
     environment:
       - DB_HOST=post-service-db
       - DB_NAME=post_service
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=5000
+      - VOTE_SERVICE_HOST=vote-service
+      - VOTE_SERVICE_PORT=5000
+      - PORT=5000
 
   subreddit-service:
     build:
@@ -52,6 +81,8 @@ services:
       - DB_NAME=subreddit_service
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - PORT=5000
+
   vote-service:
     build:
       context: ./services/vote-service
@@ -63,11 +94,13 @@ services:
       - DB_NAME=vote_service
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - PORT=5000
 
   gateway-cache:
     image: redis:latest
     ports:
       - 6379:6379
+
   user-service-db:
     image: postgres:latest
     environment:
@@ -81,6 +114,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   post-service-db:
     image: postgres:latest
     environment:
@@ -94,6 +128,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   subreddit-service-db:
     image: postgres:latest
     environment:
@@ -107,6 +142,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   vote-service-db:
     image: postgres:latest
     environment:
