@@ -200,6 +200,22 @@ class PostService(post_pb2_grpc.PostServiceServicer):
         finally:
             db.close()
 
+    def UpdateScore(self, request, context):
+        db = self._get_db()
+        try:
+            post = db.query(Post).filter(Post.id == int(request.post_id)).first()
+            if not post:
+                return post_pb2.UpdateScoreResponse(success=False)
+            
+            post.score = request.new_score
+            db.commit()
+            return post_pb2.UpdateScoreResponse(success=True)
+        except Exception:
+            db.rollback()
+            return post_pb2.UpdateScoreResponse(success=False)
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     port = os.getenv("PORT", "5000")

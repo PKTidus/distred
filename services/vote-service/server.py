@@ -3,11 +3,29 @@ from concurrent import futures
 import grpc
 from sqlalchemy import func, case
 from generated import vote_pb2, vote_pb2_grpc
+from generated import post_pb2, post_pb2_grpc
 from db import Vote
 from config import SessionLocal, init_db
 
 
+POST_SERVICE_HOST = os.getenv("POST_SERVICE_HOST", "localhost")
+POST_SERVICE_PORT = os.getenv("POST_SERVICE_PORT", "5000")
+
+
 class VoteService(vote_pb2_grpc.VoteServiceServicer):
+    def _get_post_stub(self):
+        channel = grpc.insecure_channel(f"{POST_SERVICE_HOST}:{POST_SERVICE_PORT}")
+        return post_pb2_grpc.PostServiceStub(channel)
+
+    def _notify_post_service(self, post_id, new_score):
+        try:
+            stub = self._get_post_stub()
+            stub.UpdateScore(
+                post_pb2.UpdateScoreRequest(post_id=str(post_id), new_score=new_score)
+            )
+        except Exception as e:
+            print(f"Failed to notify post service: {e}")
+
     def _get_post_score(self, db, post_id):
         try:
             p_id = int(post_id)
@@ -56,6 +74,10 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
                 )
             db.commit()
             new_score, _, _ = self._get_post_score(db, request.post_id)
+
+            # Notify Post Service
+            self._notify_post_service(request.post_id, new_score)
+
             return vote_pb2.VoteResponse(success=True, new_score=new_score)
         except Exception as e:
             print(f"Error in CastVote: {e}")
@@ -81,6 +103,10 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
                 db.commit()
 
             new_score, _, _ = self._get_post_score(db, request.post_id)
+
+            # Notify Post Service
+            self._notify_post_service(request.post_id, new_score)
+
             return vote_pb2.VoteResponse(
                 success=True,
                 new_score=new_score,
