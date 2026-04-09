@@ -29,6 +29,7 @@ message SubredditResponse {
   string description  = 3;
   string created_by   = 4;
   int64  created_at   = 5;
+  string error        = 6;
 }
 
 message ListSubredditsResponse {

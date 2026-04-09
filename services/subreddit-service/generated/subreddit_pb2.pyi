@@ -31,18 +31,20 @@ class CreateSubredditRequest(_message.Message):
     def __init__(self, name: _Optional[str] = ..., description: _Optional[str] = ..., user_id: _Optional[int] = ...) -> None: ...
 
 class SubredditResponse(_message.Message):
-    __slots__ = ("subreddit_id", "name", "description", "created_by", "created_at")
+    __slots__ = ("subreddit_id", "name", "description", "created_by", "created_at", "error")
     SUBREDDIT_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     CREATED_BY_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
     subreddit_id: str
     name: str
     description: str
     created_by: str
     created_at: int
-    def __init__(self, subreddit_id: _Optional[str] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., created_by: _Optional[str] = ..., created_at: _Optional[int] = ...) -> None: ...
+    error: str
+    def __init__(self, subreddit_id: _Optional[str] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., created_by: _Optional[str] = ..., created_at: _Optional[int] = ..., error: _Optional[str] = ...) -> None: ...
 
 class ListSubredditsResponse(_message.Message):
     __slots__ = ("subreddits",)
