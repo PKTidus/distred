@@ -23,6 +23,7 @@ message FeedItem {
   int32 score = 5;
   int32 user_vote = 6; // 1, -1, or 0
   int64 created_at = 7;
+  string body = 8;
 }
 
 message FeedResponse {

@@ -13,6 +13,7 @@ message CreatePostRequest {
   string title = 1;
   string subreddit = 2;
   int32 author_id = 3;
+  string body = 4;
 }
 
 message GetPostRequest {
@@ -41,7 +42,8 @@ message PostResponse {
   int32 score = 6;
   int32 user_vote = 7; // 1, -1, or 0
   int64 created_at = 8;
-  string error = 9;
+  string body = 9;
+  string error = 10;
 }
 
 message ListPostsResponse {

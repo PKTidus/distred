@@ -21,7 +21,7 @@ class FeedRequest(_message.Message):
     def __init__(self, sort: _Optional[str] = ..., subreddit: _Optional[str] = ..., limit: _Optional[int] = ..., offset: _Optional[int] = ..., user_id: _Optional[int] = ...) -> None: ...
 
 class FeedItem(_message.Message):
-    __slots__ = ("post_id", "title", "subreddit", "username", "score", "user_vote", "created_at")
+    __slots__ = ("post_id", "title", "subreddit", "username", "score", "user_vote", "created_at", "body")
     POST_ID_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     SUBREDDIT_FIELD_NUMBER: _ClassVar[int]
@@ -29,6 +29,7 @@ class FeedItem(_message.Message):
     SCORE_FIELD_NUMBER: _ClassVar[int]
     USER_VOTE_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    BODY_FIELD_NUMBER: _ClassVar[int]
     post_id: str
     title: str
     subreddit: str
@@ -36,7 +37,8 @@ class FeedItem(_message.Message):
     score: int
     user_vote: int
     created_at: int
-    def __init__(self, post_id: _Optional[str] = ..., title: _Optional[str] = ..., subreddit: _Optional[str] = ..., username: _Optional[str] = ..., score: _Optional[int] = ..., user_vote: _Optional[int] = ..., created_at: _Optional[int] = ...) -> None: ...
+    body: str
+    def __init__(self, post_id: _Optional[str] = ..., title: _Optional[str] = ..., subreddit: _Optional[str] = ..., username: _Optional[str] = ..., score: _Optional[int] = ..., user_vote: _Optional[int] = ..., created_at: _Optional[int] = ..., body: _Optional[str] = ...) -> None: ...
 
 class FeedResponse(_message.Message):
     __slots__ = ("items", "total")
