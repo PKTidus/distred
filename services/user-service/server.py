@@ -121,12 +121,11 @@ class UserService(user_pb2_grpc.UserServiceServicer):
 
 
 if __name__ == "__main__":
-    print("User Service listening on port 5001...")
     port = "5000"
     init_db()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     user_pb2_grpc.add_UserServiceServicer_to_server(UserService(), server)
     server.add_insecure_port("[::]:" + port)
     server.start()
-    print("Server started, listening on " + port)
+    print("User Service listening on port " + port)
     server.wait_for_termination()
