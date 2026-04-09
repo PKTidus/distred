@@ -16,15 +16,15 @@ def register():
     password = request.form.get("password", "").strip()
 
     if not all([username, password]):
-        flash("Username and password are required")
+        flash("Username and password are required", "error")
         return redirect(url_for("auth.register_form"))
 
     result = user_client.register(username=username, password=password)
     if "error" in result:
-        flash(result["error"])
+        flash(result["error"], "error")
         return redirect(url_for("auth.register_form"))
 
-    flash("User registered successfully. Please login.")
+    flash("User registered successfully. Please login.", "success")
     return redirect(url_for("auth.login_form"))
 
 
@@ -39,12 +39,12 @@ def login():
     password = request.form.get("password", "")
 
     if not username or not password:
-        flash("Username and password are required")
+        flash("Username and password are required", "error")
         return redirect(url_for("auth.login_form"))
 
     result = user_client.login(username=username, password=password)
     if "error" in result:
-        flash(result["error"])
+        flash(result["error"], "error")
         return redirect(url_for("auth.login_form"))
 
     # Login successful
@@ -64,7 +64,7 @@ def logout():
 
     response = make_response(redirect(url_for("feed.home")))
     response.delete_cookie("access_token")
-    flash("Logged out successfully")
+    flash("Logged out successfully", "success")
     return response
 
 

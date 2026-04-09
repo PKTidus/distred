@@ -10,7 +10,7 @@ post_bp = Blueprint("post", __name__)
 def create_post_form():
     return render_template(
         "create_post.html",
-        subreddits=subreddit_client.get_subreddits(),
+        subreddits=subreddit_client.get_subreddits().subreddits,
     )
 
 
@@ -21,13 +21,13 @@ def create_post():
     subreddit = request.form.get("subreddit")
 
     if not title or not subreddit:
-        flash("Title and subreddit are required")
+        flash("Title and subreddit are required", "error")
         return redirect(url_for("post.create_post_form"))
 
     response = post_client.create_post(title=title, subreddit=subreddit)
     
     if response.error:
-        flash(f"Error creating post: {response.error}")
+        flash(f"Error creating post: {response.error}", "error")
         return redirect(url_for("post.create_post_form"))
 
     return redirect(url_for("post.view_post", post_id=response.post_id))
@@ -38,9 +38,9 @@ def create_post():
 def delete_post(post_id):
     response = post_client.delete_post(post_id=post_id)
     if response.error:
-        flash(f"Error deleting post: {response.error}")
+        flash(f"Error deleting post: {response.error}", "error")
     else:
-        flash("Post deleted successfully")
+        flash("Post deleted successfully", "success")
     return redirect(url_for("feed.home"))
 
 

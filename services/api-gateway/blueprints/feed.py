@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, g
-from clients import feed_client
+from clients import feed_client, subreddit_client
 from middleware import optional_auth
 
 feed_bp = Blueprint("feed", __name__)
@@ -22,6 +22,7 @@ def home():
         posts=posts_result.items,
         total_pages=posts_result.total,
         page=page,
+        sort=sort
     )
 
 
@@ -36,6 +37,13 @@ def subreddit(slug):
     posts_result = feed_client.get_subreddit_feed(
         subreddit=slug, sort=sort, page=page, per_page=per_page, user_id=user_id
     )
+    
+    # Fetch subreddit details for the sidebar
+    subreddit_info = None
+    try:
+        subreddit_info = subreddit_client.get_subreddit(slug)
+    except Exception:
+        pass
 
     return render_template(
         "feed.html",
@@ -43,4 +51,6 @@ def subreddit(slug):
         title=f"r/{slug}",
         total_pages=posts_result.total,
         page=page,
+        sort=sort,
+        subreddit_info=subreddit_info
     )

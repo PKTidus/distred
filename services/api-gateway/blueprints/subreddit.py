@@ -19,13 +19,16 @@ def create_subreddit():
     description = request.form.get("description", "")
 
     if not name:
-        flash("Subreddit name is required")
+        flash("Subreddit name is required", "error")
         return redirect(url_for("subreddit.create_subreddit_form"))
 
     response = subreddit_client.create_subreddit(name=name, description=description)
+    
+    # Use the error field from the gRPC response
     if response.error:
-        flash(f"Error creating subreddit: {response.error}")
+        flash(f"Error creating subreddit: {response.error}", "error")
         return redirect(url_for("subreddit.create_subreddit_form"))
 
+    flash("Subreddit created successfully", "success")
     # Redirect to the subreddit feed
     return redirect(url_for("feed.subreddit", slug=response.name))
