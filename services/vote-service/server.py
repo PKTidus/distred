@@ -110,49 +110,6 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
         finally:
             db.close()
 
-    def GetScores(
-        self, request: vote_pb2.GetScoresRequest, context
-    ) -> vote_pb2.GetScoresResponse:
-        db = SessionLocal()
-        try:
-            p_ids = [int(pid) for pid in request.post_ids]
-            results = (
-                db.query(
-                    Vote.post_id,
-                    func.sum(Vote.score).label("score"),
-                    func.sum(case((Vote.score == 1, 1), else_=0)).label("upvotes"),
-                    func.sum(case((Vote.score == -1, 1), else_=0)).label("downvotes"),
-                )
-                .filter(Vote.post_id.in_(p_ids))
-                .group_by(Vote.post_id)
-                .all()
-            )
-
-            score_map = {str(r.post_id): r for r in results}
-            scores = []
-            for pid in request.post_ids:
-                if pid in score_map:
-                    r = score_map[pid]
-                    scores.append(
-                        vote_pb2.PostScore(
-                            post_id=pid,
-                            score=int(r.score or 0),
-                            upvotes=int(r.upvotes or 0),
-                            downvotes=int(r.downvotes or 0),
-                        )
-                    )
-                else:
-                    scores.append(
-                        vote_pb2.PostScore(post_id=pid, score=0, upvotes=0, downvotes=0)
-                    )
-
-            return vote_pb2.GetScoresResponse(scores=scores)
-        except Exception as e:
-            print(f"Error in GetScores: {e}")
-            return vote_pb2.GetScoresResponse(scores=[])
-        finally:
-            db.close()
-
     def GetUserVote(
         self, request: vote_pb2.GetUserVoteRequest, context
     ) -> vote_pb2.UserVoteResponse:

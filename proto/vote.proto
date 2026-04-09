@@ -6,7 +6,6 @@ service VoteService {
   rpc CastVote    (CastVoteRequest)    returns (VoteResponse);
   rpc RemoveVote  (RemoveVoteRequest)  returns (VoteResponse);
   rpc GetScore    (GetScoreRequest)    returns (ScoreResponse);
-  rpc GetScores   (GetScoresRequest)   returns (GetScoresResponse);  // batch
   rpc GetUserVote (GetUserVoteRequest) returns (UserVoteResponse);   // did this user vote on this post?
 }
 
@@ -23,10 +22,6 @@ message RemoveVoteRequest {
 
 message GetScoreRequest {
   string post_id = 1;
-}
-
-message GetScoresRequest {
-  repeated string post_ids = 1;
 }
 
 message GetUserVoteRequest {
@@ -51,10 +46,6 @@ message PostScore {
   int32  score     = 2;
   int32  upvotes   = 3;
   int32  downvotes = 4;
-}
-
-message GetScoresResponse {
-  repeated PostScore scores = 1;
 }
 
 message UserVoteResponse {

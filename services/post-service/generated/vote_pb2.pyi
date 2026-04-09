@@ -1,8 +1,6 @@
-from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Iterable as _Iterable, Mapping as _Mapping
-from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Optional as _Optional
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -29,12 +27,6 @@ class GetScoreRequest(_message.Message):
     POST_ID_FIELD_NUMBER: _ClassVar[int]
     post_id: str
     def __init__(self, post_id: _Optional[str] = ...) -> None: ...
-
-class GetScoresRequest(_message.Message):
-    __slots__ = ("post_ids",)
-    POST_IDS_FIELD_NUMBER: _ClassVar[int]
-    post_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, post_ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetUserVoteRequest(_message.Message):
     __slots__ = ("post_id", "user_id")
@@ -75,12 +67,6 @@ class PostScore(_message.Message):
     upvotes: int
     downvotes: int
     def __init__(self, post_id: _Optional[str] = ..., score: _Optional[int] = ..., upvotes: _Optional[int] = ..., downvotes: _Optional[int] = ...) -> None: ...
-
-class GetScoresResponse(_message.Message):
-    __slots__ = ("scores",)
-    SCORES_FIELD_NUMBER: _ClassVar[int]
-    scores: _containers.RepeatedCompositeFieldContainer[PostScore]
-    def __init__(self, scores: _Optional[_Iterable[_Union[PostScore, _Mapping]]] = ...) -> None: ...
 
 class UserVoteResponse(_message.Message):
     __slots__ = ("voted", "value")

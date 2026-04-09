@@ -49,11 +49,6 @@ class VoteServiceStub(object):
                 request_serializer=vote__pb2.GetScoreRequest.SerializeToString,
                 response_deserializer=vote__pb2.ScoreResponse.FromString,
                 _registered_method=True)
-        self.GetScores = channel.unary_unary(
-                '/vote.VoteService/GetScores',
-                request_serializer=vote__pb2.GetScoresRequest.SerializeToString,
-                response_deserializer=vote__pb2.GetScoresResponse.FromString,
-                _registered_method=True)
         self.GetUserVote = channel.unary_unary(
                 '/vote.VoteService/GetUserVote',
                 request_serializer=vote__pb2.GetUserVoteRequest.SerializeToString,
@@ -82,13 +77,6 @@ class VoteServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetScores(self, request, context):
-        """batch
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def GetUserVote(self, request, context):
         """did this user vote on this post?
         """
@@ -113,11 +101,6 @@ def add_VoteServiceServicer_to_server(servicer, server):
                     servicer.GetScore,
                     request_deserializer=vote__pb2.GetScoreRequest.FromString,
                     response_serializer=vote__pb2.ScoreResponse.SerializeToString,
-            ),
-            'GetScores': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetScores,
-                    request_deserializer=vote__pb2.GetScoresRequest.FromString,
-                    response_serializer=vote__pb2.GetScoresResponse.SerializeToString,
             ),
             'GetUserVote': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUserVote,
@@ -206,33 +189,6 @@ class VoteService(object):
             '/vote.VoteService/GetScore',
             vote__pb2.GetScoreRequest.SerializeToString,
             vote__pb2.ScoreResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def GetScores(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/vote.VoteService/GetScores',
-            vote__pb2.GetScoresRequest.SerializeToString,
-            vote__pb2.GetScoresResponse.FromString,
             options,
             channel_credentials,
             insecure,

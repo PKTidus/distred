@@ -14,6 +14,7 @@ class Post(Base):
     body = Column(Text, nullable=True)
     subreddit = Column(String(100), nullable=False)
     author_id = Column(Integer, nullable=False)
+    score = Column(Integer, default=0)
     created_at = Column(BigInteger, default=lambda: int(time.time()))
 
     def __repr__(self):
