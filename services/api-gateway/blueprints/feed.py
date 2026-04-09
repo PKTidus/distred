@@ -1,3 +1,4 @@
+import math
 from flask import Blueprint, render_template, request, g
 from clients import feed_client, subreddit_client
 from middleware import optional_auth
@@ -16,11 +17,14 @@ def home():
     posts_result = feed_client.get_home_feed(
         sort=sort, page=page, per_page=per_page, user_id=user_id
     )
+    
+    total_posts = posts_result.total
+    total_pages = math.ceil(total_posts / per_page)
 
     return render_template(
         "feed.html",
         posts=posts_result.items,
-        total_pages=posts_result.total,
+        total_pages=total_pages,
         page=page,
         sort=sort
     )
@@ -38,6 +42,9 @@ def subreddit(slug):
         subreddit=slug, sort=sort, page=page, per_page=per_page, user_id=user_id
     )
     
+    total_posts = posts_result.total
+    total_pages = math.ceil(total_posts / per_page)
+    
     # Fetch subreddit details for the sidebar
     subreddit_info = None
     try:
@@ -49,7 +56,7 @@ def subreddit(slug):
         "feed.html",
         posts=posts_result.items,
         title=f"r/{slug}",
-        total_pages=posts_result.total,
+        total_pages=total_pages,
         page=page,
         sort=sort,
         subreddit_info=subreddit_info
