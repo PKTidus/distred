@@ -54,11 +54,13 @@ class PostService(post_pb2_grpc.PostServiceServicer):
             # Automatically upvote
             try:
                 vote_stub = self._get_vote_stub()
-                vote_stub.CastVote(vote_pb2.CastVoteRequest(
-                    post_id=str(post.id),
-                    user_id=str(post.author_id),
-                    value=1
-                ))
+                vote_stub.CastVote(
+                    vote_pb2.CastVoteRequest(
+                        post_id=str(post.id),
+                        user_id=str(post.author_id),
+                        value=1,
+                    )
+                )
             except Exception:
                 pass
 
@@ -88,24 +90,17 @@ class PostService(post_pb2_grpc.PostServiceServicer):
 
             # Fetch additional info
             username = self._get_username(post.author_id)
-            score = 0
             user_vote = 0
-
-            # Fetch score
-            try:
-                vote_stub = self._get_vote_stub()
-                score_resp = vote_stub.GetScore(vote_pb2.GetScoreRequest(post_id=request.post_id))
-                score = score_resp.score
-            except Exception:
-                pass
 
             # Fetch user vote if authenticated
             if request.user_id != 0:
                 try:
                     vote_stub = self._get_vote_stub()
-                    uv_resp = vote_stub.GetUserVote(vote_pb2.GetUserVoteRequest(
-                        post_id=request.post_id, user_id=str(request.user_id)
-                    ))
+                    uv_resp = vote_stub.GetUserVote(
+                        vote_pb2.GetUserVoteRequest(
+                            post_id=request.post_id, user_id=str(request.user_id)
+                        )
+                    )
                     user_vote = uv_resp.value
                 except Exception:
                     pass
@@ -117,7 +112,7 @@ class PostService(post_pb2_grpc.PostServiceServicer):
                 subreddit=post.subreddit,
                 author_id=post.author_id,
                 username=username,
-                score=score,
+                score=post.score or 0,
                 user_vote=user_vote,
                 created_at=post.created_at,
             )
