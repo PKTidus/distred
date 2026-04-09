@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Create Subreddit{% endblock %}
+
+{% block content %}
+<h2>Create a new Subreddit</h2>
+<form method="post">
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" placeholder="e.g. programming" required>
+    </div>
+    <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" placeholder="What is this subreddit about?"></textarea>
+    </div>
+    <button type="submit">Create Subreddit</button>
+</form>
+{% endblock %}
