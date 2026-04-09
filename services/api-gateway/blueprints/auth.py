@@ -1,70 +1,77 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, redirect, render_template, request, url_for, flash, make_response, g
 from clients import user_client
-from middleware import require_auth
+from middleware import require_auth, extract_bearer_token
 
 auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.post("/register")
+@auth_bp.route("/register", methods=["GET"])
+def register_form():
+    return render_template("register.html")
+
+
+@auth_bp.route("/register", methods=["POST"])
 def register():
-    data = request.get_json(force=True)
-    username = data.get("username", "").strip()
-    password = data.get("password", "").strip()
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "").strip()
 
     if not all([username, password]):
-        return jsonify({"error": "username and password are required"}), 400
+        flash("Username and password are required")
+        return redirect(url_for("auth.register_form"))
 
     result = user_client.register(username=username, password=password)
     if "error" in result:
-        return jsonify(result), 400
+        flash(result["error"])
+        return redirect(url_for("auth.register_form"))
 
-    return jsonify({"message": "User registered successfully"}), 201
+    flash("User registered successfully. Please login.")
+    return redirect(url_for("auth.login_form"))
 
 
-@auth_bp.post("/login")
+@auth_bp.route("/login", methods=["GET"])
+def login_form():
+    return render_template("login.html")
+
+
+@auth_bp.route("/login", methods=["POST"])
 def login():
-    if request.content_type and "application/json" in request.content_type:
-        data = request.get_json(force=True)
-        username = data.get("username", "")
-        password = data.get("password", "")
-    else:
-        username = request.form.get("username", "")
-        password = request.form.get("password", "")
+    username = request.form.get("username", "")
+    password = request.form.get("password", "")
 
     if not username or not password:
-        return jsonify({"error": "username and password are required"}), 400
+        flash("Username and password are required")
+        return redirect(url_for("auth.login_form"))
 
     result = user_client.login(username=username, password=password)
     if "error" in result:
-        return jsonify(result), 401
+        flash(result["error"])
+        return redirect(url_for("auth.login_form"))
 
-    return jsonify(result), 200
+    # Login successful
+    token = result["access_token"]
+    next_url = request.args.get("next") or url_for("feed.home")
+    response = make_response(redirect(next_url))
+    response.set_cookie("access_token", token, httponly=True)
+    return response
 
 
-@auth_bp.post("/logout")
-@require_auth
+@auth_bp.route("/logout", methods=["GET", "POST"])
 def logout():
     """Invalidate the current token by adding it to the blacklist."""
-    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    token = extract_bearer_token()
+    if token:
+        user_client.logout(token=token)
 
-    result = user_client.logout(token=token)
-    if "error" in result:
-        return jsonify(result), 400
-    return jsonify({"message": "Logged out successfully"}), 200
-
-
-# ------------------------------------------------------------------
-# Protected routes
-# ------------------------------------------------------------------
+    response = make_response(redirect(url_for("feed.home")))
+    response.delete_cookie("access_token")
+    flash("Logged out successfully")
+    return response
 
 
 @auth_bp.get("/me")
 @require_auth
 def get_me():
     """Return the currently authenticated user's profile."""
-    result = user_client.get_current_user(
-        token=request.headers.get("Authorization", "").replace("Bearer ", "")
-    )
-    if "error" in result:
-        return jsonify(result), 401
-    return jsonify(result), 200
+    token = extract_bearer_token()
+    result = user_client.get_current_user(token=token)
+    return {"id": result.id, "username": result.username, "error": result.error}

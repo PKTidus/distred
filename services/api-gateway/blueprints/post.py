@@ -19,12 +19,13 @@ def create_post_form():
 def create_post():
     title = request.form.get("title")
     subreddit = request.form.get("subreddit")
+
     if not title or not subreddit:
         flash("Title and subreddit are required")
         return redirect(url_for("post.create_post_form"))
 
     response = post_client.create_post(title=title, subreddit=subreddit)
-
+    
     if response.error:
         flash(f"Error creating post: {response.error}")
         return redirect(url_for("post.create_post_form"))
@@ -35,8 +36,6 @@ def create_post():
 @post_bp.route("/<post_id>", methods=["POST"])
 @require_auth
 def delete_post(post_id):
-    # Standard HTML forms don't support DELETE, so we use POST with a hidden field or just a dedicated route.
-    # Often 'delete' is handled via a POST request in simple web apps.
     response = post_client.delete_post(post_id=post_id)
     if response.error:
         flash(f"Error deleting post: {response.error}")

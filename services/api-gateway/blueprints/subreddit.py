@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from clients import subreddit_client
 from middleware import require_auth
 
@@ -15,12 +15,17 @@ def create_subreddit_form():
 @subreddit_bp.route("/create", methods=["POST"])
 @require_auth
 def create_subreddit():
-    data = request.get_json()
-    name = data.get("name")
-    description = data.get("description", "")
+    name = request.form.get("name")
+    description = request.form.get("description", "")
+
+    if not name:
+        flash("Subreddit name is required")
+        return redirect(url_for("subreddit.create_subreddit_form"))
 
     response = subreddit_client.create_subreddit(name=name, description=description)
-    return render_template(
-        "subreddit.html",
-        subreddit=response,
-    )
+    if response.error:
+        flash(f"Error creating subreddit: {response.error}")
+        return redirect(url_for("subreddit.create_subreddit_form"))
+
+    # Usually redirect to the subreddit feed
+    return redirect(url_for("feed.subreddit", slug=response.name))
