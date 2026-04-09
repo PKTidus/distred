@@ -7,7 +7,7 @@ from middleware import extract_bearer_token
 from clients import user_client
 
 POST_SERVICE_HOST = os.getenv("POST_SERVICE_HOST", "localhost")
-POST_SERVICE_PORT = os.getenv("POST_SERVICE_PORT", "50051")
+POST_SERVICE_PORT = os.getenv("POST_SERVICE_PORT", "5000")
 
 
 def get_channel():

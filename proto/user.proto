@@ -8,6 +8,11 @@ service UserService {
   rpc Logout (LogoutRequest) returns (LogoutResponse);
   rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
   rpc GetCurrentUser (GetCurrentUserRequest) returns (UserResponse);
+  rpc GetUser (GetUserRequest) returns (UserResponse);
+}
+
+message GetUserRequest {
+  int32 user_id = 1;
 }
 
 message RegisterRequest {
