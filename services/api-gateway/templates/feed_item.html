@@ -20,21 +20,21 @@ message FeedItem {
 <div class="vote-col">
 
     {# ── UPVOTE ── #}
-    {% if session.token %}
+    {% if g.token %}
     {% if post.user_vote == 1 %}
-    <form method="POST" action="{{ url_for('vote.clear', post_id=post.id) }}">
+    <form method="POST" action="{{ url_for('vote.clear', post_id=post.post_id) }}">
         <input type="hidden" name="next" value="{{ request.path }}">
         <button type="submit" class="vote-btn vote-up active" aria-label="Remove upvote">▲</button>
     </form>
     {% else %}
-    <form method="POST" action="{{ url_for('vote.cast', post_id=post.id) }}">
+    <form method="POST" action="{{ url_for('vote.cast', post_id=post.post_id) }}">
         <input type="hidden" name="direction" value="up">
         <input type="hidden" name="next" value="{{ request.path }}">
         <button type="submit" class="vote-btn vote-up" aria-label="Upvote">▲</button>
     </form>
     {% endif %}
     {% else %}
-    <a href="{{ url_for('auth.login') }}" class="vote-btn vote-up" title="Login to vote">▲</a>
+    <a href="{{ url_for('auth.login_form') }}" class="vote-btn vote-up" title="Login to vote">▲</a>
     {% endif %}
 
     <span class="vote-score {% if post.user_vote == 1 %}score-up{% elif post.user_vote == -1 %}score-down{% endif %}">
@@ -42,21 +42,21 @@ message FeedItem {
     </span>
 
     {# ── DOWNVOTE ── #}
-    {% if session.token %}
+    {% if g.token %}
     {% if post.user_vote == -1 %}
-    <form method="POST" action="{{ url_for('vote.clear', post_id=post.id) }}">
+    <form method="POST" action="{{ url_for('vote.clear', post_id=post.post_id) }}">
         <input type="hidden" name="next" value="{{ request.path }}">
         <button type="submit" class="vote-btn vote-down active" aria-label="Remove downvote">▼</button>
     </form>
     {% else %}
-    <form method="POST" action="{{ url_for('vote.cast', post_id=post.id) }}">
+    <form method="POST" action="{{ url_for('vote.cast', post_id=post.post_id) }}">
         <input type="hidden" name="direction" value="down">
         <input type="hidden" name="next" value="{{ request.path }}">
         <button type="submit" class="vote-btn vote-down" aria-label="Downvote">▼</button>
     </form>
     {% endif %}
     {% else %}
-    <a href="{{ url_for('auth.login') }}" class="vote-btn vote-down" title="Login to vote">▼</a>
+    <a href="{{ url_for('auth.login_form') }}" class="vote-btn vote-down" title="Login to vote">▼</a>
     {% endif %}
 
 </div>
@@ -72,7 +72,7 @@ message FeedItem {
         </div>
 
         <h2 class="post-title">
-            {{ post.title }}
+            <a href="{{ url_for('post.view_post', post_id=post.post_id) }}">{{ post.title }}</a>
         </h2>
     </div>
 

@@ -12,22 +12,22 @@
 
     <nav>
         <ul>
-            <li><a href="{{ url_for('pages.home') }}">Home</a></li>
-            <li><a href="{{ url_for('pages.topics') }}">Topics</a></li>
+            <li><a href="{{ url_for('feed.home') }}">Home</a></li>
+            <li><a href="{{ url_for('subreddit.create_subreddit_form') }}">Create Subreddit</a></li>
         </ul>
 
-        {% if session.token %}
+        {% if g.token %}
         <div class="user-info">
             Welcome, {{ g.username }}!
-            <a href="{{ url_for('pages.create_post') }}">+ Post</a>
-            <form method="POST" action="{{ url_for('auth.logout') }}">
+            <a href="{{ url_for('post.create_post_form') }}">+ Post</a>
+            <form method="POST" action="{{ url_for('auth.logout') }}" style="display: inline;">
                 <button type="submit">Logout</button>
             </form>
         </div>
         {% else %}
         <div class="login-prompt">
-            <a href="{{ url_for('auth.login') }}">Login</a>
-            <a href="{{ url_for('auth.register') }}">Register</a>
+            <a href="{{ url_for('auth.login_form') }}">Login</a>
+            <a href="{{ url_for('auth.register_form') }}">Register</a>
         </div>
         {% endif %}
     </nav>
