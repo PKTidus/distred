@@ -91,6 +91,19 @@ class UserService(user_pb2_grpc.UserServiceServicer):
         finally:
             db.close()
 
+    def GetUser(self, request, context):
+        db = self._get_db()
+        try:
+            user = db.query(User).filter(User.id == request.user_id).first()
+            if not user:
+                return user_pb2.UserResponse(error="User not found")
+            return user_pb2.UserResponse(
+                id=int(user.id),  # type: ignore
+                username=str(user.username),
+            )
+        finally:
+            db.close()
+
     def Logout(self, request: user_pb2.LogoutRequest, context):
         token = request.token
         db = self._get_db()

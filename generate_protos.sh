@@ -49,19 +49,21 @@ generate_go_proto() {
 
 # --- Services and their proto dependencies ---
 
-# user.proto -> user-service (server) + api-gateway (client)
+# user.proto -> user-service (server) + api-gateway (client) + post-service (client)
 generate_proto "user" "./services/user-service/generated"
 generate_proto "user" "./services/api-gateway/generated"
+generate_proto "user" "./services/post-service/generated"
 
 # post.proto -> post-service (server) + api-gateway (client) + feed-service (client)
 generate_proto "post" "./services/post-service/generated"
 generate_proto "post" "./services/api-gateway/generated"
 generate_proto "post" "./services/feed-service/generated"
 
-# vote.proto -> vote-service (server) + api-gateway (client) + feed-service (client)
+# vote.proto -> vote-service (server) + api-gateway (client) + feed-service (client) + post-service (client)
 generate_proto "vote" "./services/vote-service/generated"
 generate_proto "vote" "./services/api-gateway/generated"
 generate_proto "vote" "./services/feed-service/generated"
+generate_proto "vote" "./services/post-service/generated"
 
 # feed.proto -> feed-service (server) + api-gateway (client)
 generate_proto "feed" "./services/feed-service/generated"
