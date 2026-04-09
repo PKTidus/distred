@@ -6,7 +6,7 @@ import logging
 import hashlib
 import os
 from typing import Optional
-from flask import json, request
+from flask import json
 
 import jwt
 import redis
