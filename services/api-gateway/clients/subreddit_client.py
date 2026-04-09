@@ -7,7 +7,7 @@ from clients import user_client
 from middleware import extract_bearer_token
 
 SUBREDDIT_SERVICE_HOST = os.getenv("SUBREDDIT_SERVICE_HOST", "localhost")
-SUBREDDIT_SERVICE_PORT = os.getenv("SUBREDDIT_SERVICE_PORT", "50051")
+SUBREDDIT_SERVICE_PORT = os.getenv("SUBREDDIT_SERVICE_PORT", "5000")
 
 
 def get_channel():
