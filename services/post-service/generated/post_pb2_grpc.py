@@ -54,6 +54,11 @@ class PostServiceStub(object):
                 request_serializer=post__pb2.DeletePostRequest.SerializeToString,
                 response_deserializer=post__pb2.DeletePostResponse.FromString,
                 _registered_method=True)
+        self.UpdateScore = channel.unary_unary(
+                '/post.PostService/UpdateScore',
+                request_serializer=post__pb2.UpdateScoreRequest.SerializeToString,
+                response_deserializer=post__pb2.UpdateScoreResponse.FromString,
+                _registered_method=True)
 
 
 class PostServiceServicer(object):
@@ -83,6 +88,12 @@ class PostServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UpdateScore(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PostServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -105,6 +116,11 @@ def add_PostServiceServicer_to_server(servicer, server):
                     servicer.DeletePost,
                     request_deserializer=post__pb2.DeletePostRequest.FromString,
                     response_serializer=post__pb2.DeletePostResponse.SerializeToString,
+            ),
+            'UpdateScore': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateScore,
+                    request_deserializer=post__pb2.UpdateScoreRequest.FromString,
+                    response_serializer=post__pb2.UpdateScoreResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -215,6 +231,33 @@ class PostService(object):
             '/post.PostService/DeletePost',
             post__pb2.DeletePostRequest.SerializeToString,
             post__pb2.DeletePostResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateScore(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/post.PostService/UpdateScore',
+            post__pb2.UpdateScoreRequest.SerializeToString,
+            post__pb2.UpdateScoreResponse.FromString,
             options,
             channel_credentials,
             insecure,

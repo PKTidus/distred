@@ -7,6 +7,7 @@ service PostService {
   rpc GetPost    (GetPostRequest)    returns (PostResponse);
   rpc ListPosts  (ListPostsRequest)  returns (ListPostsResponse);
   rpc DeletePost (DeletePostRequest) returns (DeletePostResponse);
+  rpc UpdateScore (UpdateScoreRequest) returns (UpdateScoreResponse);
 }
 
 message CreatePostRequest {
@@ -26,6 +27,16 @@ message ListPostsRequest {
   int32 limit = 2;
   int32 offset = 3;
   int32 user_id = 4; // 0 if unauthenticated
+  string sort = 5;   // "hot", "top", "new"
+}
+
+message UpdateScoreRequest {
+  string post_id = 1;
+  int32 new_score = 2;
+}
+
+message UpdateScoreResponse {
+  bool success = 1;
 }
 
 message DeletePostRequest {

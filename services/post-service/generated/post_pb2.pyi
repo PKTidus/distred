@@ -27,16 +27,32 @@ class GetPostRequest(_message.Message):
     def __init__(self, post_id: _Optional[str] = ..., user_id: _Optional[int] = ...) -> None: ...
 
 class ListPostsRequest(_message.Message):
-    __slots__ = ("subreddit", "limit", "offset", "user_id")
+    __slots__ = ("subreddit", "limit", "offset", "user_id", "sort")
     SUBREDDIT_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     OFFSET_FIELD_NUMBER: _ClassVar[int]
     USER_ID_FIELD_NUMBER: _ClassVar[int]
+    SORT_FIELD_NUMBER: _ClassVar[int]
     subreddit: str
     limit: int
     offset: int
     user_id: int
-    def __init__(self, subreddit: _Optional[str] = ..., limit: _Optional[int] = ..., offset: _Optional[int] = ..., user_id: _Optional[int] = ...) -> None: ...
+    sort: str
+    def __init__(self, subreddit: _Optional[str] = ..., limit: _Optional[int] = ..., offset: _Optional[int] = ..., user_id: _Optional[int] = ..., sort: _Optional[str] = ...) -> None: ...
+
+class UpdateScoreRequest(_message.Message):
+    __slots__ = ("post_id", "new_score")
+    POST_ID_FIELD_NUMBER: _ClassVar[int]
+    NEW_SCORE_FIELD_NUMBER: _ClassVar[int]
+    post_id: str
+    new_score: int
+    def __init__(self, post_id: _Optional[str] = ..., new_score: _Optional[int] = ...) -> None: ...
+
+class UpdateScoreResponse(_message.Message):
+    __slots__ = ("success",)
+    SUCCESS_FIELD_NUMBER: _ClassVar[int]
+    success: bool
+    def __init__(self, success: bool = ...) -> None: ...
 
 class DeletePostRequest(_message.Message):
     __slots__ = ("post_id", "author_id")

@@ -54,10 +54,11 @@ generate_proto "user" "./services/user-service/generated"
 generate_proto "user" "./services/api-gateway/generated"
 generate_proto "user" "./services/post-service/generated"
 
-# post.proto -> post-service (server) + api-gateway (client) + feed-service (client)
+# post.proto -> post-service (server) + api-gateway (client) + feed-service (client) + vote-service (client)
 generate_proto "post" "./services/post-service/generated"
 generate_proto "post" "./services/api-gateway/generated"
 generate_proto "post" "./services/feed-service/generated"
+generate_proto "post" "./services/vote-service/generated"
 
 # vote.proto -> vote-service (server) + api-gateway (client) + feed-service (client) + post-service (client)
 generate_proto "vote" "./services/vote-service/generated"
