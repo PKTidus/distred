@@ -58,6 +58,14 @@ feed_item.html — included by feed.html
             <h4 style="margin: 0.5rem 0;">
                 <a href="{{ url_for('post.view_post', post_id=post.post_id) }}" class="contrast">{{ post.title }}</a>
             </h4>
+
+            <div class="post-body">
+                {% if show_full %}
+                    <p style="white-space: pre-wrap;">{{ post.body }}</p>
+                {% else %}
+                    <p>{{ post.body[:100] }}{% if post.body|length > 100 %}...{% endif %}</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </article>

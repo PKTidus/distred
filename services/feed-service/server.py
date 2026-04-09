@@ -17,7 +17,6 @@ class FeedService(feed_pb2_grpc.FeedServiceServicer):
     def GetHomeFeed(self, request, context):
         try:
             post_stub = self._get_post_stub()
-            # Post service's ListPosts can handle home feed by sending empty subreddit
             post_request = post_pb2.ListPostsRequest(
                 subreddit="",
                 limit=request.limit,
@@ -35,7 +34,8 @@ class FeedService(feed_pb2_grpc.FeedServiceServicer):
                     username=p.username,
                     score=p.score,
                     user_vote=p.user_vote,
-                    created_at=p.created_at
+                    created_at=p.created_at,
+                    body=p.body
                 ))
                 
             return feed_pb2.FeedResponse(items=feed_items, total=post_response.total)
@@ -63,7 +63,8 @@ class FeedService(feed_pb2_grpc.FeedServiceServicer):
                     username=p.username,
                     score=p.score,
                     user_vote=p.user_vote,
-                    created_at=p.created_at
+                    created_at=p.created_at,
+                    body=p.body
                 ))
                 
             return feed_pb2.FeedResponse(items=feed_items, total=post_response.total)

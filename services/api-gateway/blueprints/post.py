@@ -18,13 +18,14 @@ def create_post_form():
 @require_auth
 def create_post():
     title = request.form.get("title")
+    body = request.form.get("body", "")
     subreddit = request.form.get("subreddit")
 
     if not title or not subreddit:
         flash("Title and subreddit are required", "error")
         return redirect(url_for("post.create_post_form"))
 
-    response = post_client.create_post(title=title, subreddit=subreddit)
+    response = post_client.create_post(title=title, body=body, subreddit=subreddit)
     
     if response.error:
         flash(f"Error creating post: {response.error}", "error")

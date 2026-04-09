@@ -2,5 +2,6 @@
 {% block title %}{{ post.title }} | Dist-Redd{% endblock %}
 
 {% block content %}
+{% set show_full = True %}
 {% include "feed_item.html" %}
 {% endblock %}

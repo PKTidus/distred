@@ -41,6 +41,7 @@ class PostService(post_pb2_grpc.PostServiceServicer):
         try:
             post = Post(
                 title=request.title,
+                body=request.body,
                 subreddit=request.subreddit,
                 author_id=request.author_id,
             )
@@ -64,6 +65,7 @@ class PostService(post_pb2_grpc.PostServiceServicer):
             return post_pb2.PostResponse(
                 post_id=str(post.id),
                 title=post.title,
+                body=post.body or "",
                 subreddit=post.subreddit,
                 author_id=post.author_id,
                 username=username,
@@ -111,6 +113,7 @@ class PostService(post_pb2_grpc.PostServiceServicer):
             return post_pb2.PostResponse(
                 post_id=str(post.id),
                 title=post.title,
+                body=post.body or "",
                 subreddit=post.subreddit,
                 author_id=post.author_id,
                 username=username,
@@ -165,6 +168,7 @@ class PostService(post_pb2_grpc.PostServiceServicer):
                 res_posts.append(post_pb2.PostResponse(
                     post_id=p_id_str,
                     title=p.title,
+                    body=p.body or "",
                     subreddit=p.subreddit,
                     author_id=p.author_id,
                     username=author_usernames[p.author_id],

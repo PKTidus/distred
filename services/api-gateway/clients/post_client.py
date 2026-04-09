@@ -18,11 +18,11 @@ def get_stub():
     return post_pb2_grpc.PostServiceStub(get_channel())
 
 
-def create_post(title: str, subreddit: str) -> post_pb2.PostResponse:
+def create_post(title: str, body: str, subreddit: str) -> post_pb2.PostResponse:
     stub = get_stub()
     user = user_client.get_current_user(extract_bearer_token() or "")
     response = stub.CreatePost(
-        post_pb2.CreatePostRequest(title=title, subreddit=subreddit, author_id=user.id)
+        post_pb2.CreatePostRequest(title=title, body=body, subreddit=subreddit, author_id=user.id)
     )
     return response
 
