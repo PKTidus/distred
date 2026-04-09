@@ -1,6 +1,7 @@
+import os
 from concurrent import futures
 import grpc
-from sqlalchemy import func
+from sqlalchemy import func, case
 from generated import vote_pb2, vote_pb2_grpc
 from db import Vote
 from config import SessionLocal, init_db
@@ -8,42 +9,56 @@ from config import SessionLocal, init_db
 
 class VoteService(vote_pb2_grpc.VoteServiceServicer):
     def _get_post_score(self, db, post_id):
+        try:
+            p_id = int(post_id)
+        except ValueError:
+            return 0, 0, 0
+
         result = (
             db.query(
                 func.sum(Vote.score).label("score"),
-                func.count(Vote.score).filter(Vote.score == 1).label("upvotes"),
-                func.count(Vote.score).filter(Vote.score == -1).label("downvotes"),
+                func.sum(case((Vote.score == 1, 1), else_=0)).label("upvotes"),
+                func.sum(case((Vote.score == -1, 1), else_=0)).label("downvotes"),
             )
-            .filter(Vote.post_id == post_id)
+            .filter(Vote.post_id == p_id)
             .one()
         )
-        return result.score or 0, result.upvotes or 0, result.downvotes or 0
+        return (
+            int(result.score or 0),
+            int(result.upvotes or 0),
+            int(result.downvotes or 0),
+        )
 
     def CastVote(self, request: vote_pb2.CastVoteRequest, context):
         db = SessionLocal()
         try:
+            p_id = int(request.post_id)
+            u_id = int(request.user_id)
+            val = int(request.value)
+
             existing = (
                 db.query(Vote)
                 .filter(
-                    Vote.post_id == request.post_id,
-                    Vote.user_id == request.user_id,
+                    Vote.post_id == p_id,
+                    Vote.user_id == u_id,
                 )
                 .first()
             )
             if existing:
-                existing.score = request.score
+                existing.score = val
             else:
                 db.add(
                     Vote(
-                        post_id=request.post_id,
-                        user_id=request.user_id,
-                        score=request.score,
+                        post_id=p_id,
+                        user_id=u_id,
+                        score=val,
                     )
                 )
             db.commit()
             new_score, _, _ = self._get_post_score(db, request.post_id)
             return vote_pb2.VoteResponse(success=True, new_score=new_score)
         except Exception as e:
+            print(f"Error in CastVote: {e}")
             db.rollback()
             return vote_pb2.VoteResponse(success=False)
         finally:
@@ -52,17 +67,26 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
     def RemoveVote(self, request: vote_pb2.RemoveVoteRequest, context):
         db = SessionLocal()
         try:
-            vote = db.query(Vote).filter(Vote.id == request.vote_id).first()
-            if not vote:
-                return vote_pb2.VoteResponse(success=False)
-            db.delete(vote)
-            db.commit()
+            p_id = int(request.post_id)
+            u_id = int(request.user_id)
+
+            vote = (
+                db.query(Vote)
+                .filter(Vote.post_id == p_id, Vote.user_id == u_id)
+                .first()
+            )
+
+            if vote:
+                db.delete(vote)
+                db.commit()
+
             new_score, _, _ = self._get_post_score(db, request.post_id)
             return vote_pb2.VoteResponse(
                 success=True,
                 new_score=new_score,
             )
         except Exception as e:
+            print(f"Error in RemoveVote: {e}")
             db.rollback()
             return vote_pb2.VoteResponse(success=False)
         finally:
@@ -73,10 +97,16 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
         try:
             score, upvotes, downvotes = self._get_post_score(db, request.post_id)
             return vote_pb2.ScoreResponse(
-                score=score, upvotes=upvotes, downvotes=downvotes
+                post_id=request.post_id,
+                score=score,
+                upvotes=upvotes,
+                downvotes=downvotes,
             )
-        except Exception:
-            return vote_pb2.ScoreResponse(score=0, upvotes=0, downvotes=0)
+        except Exception as e:
+            print(f"Error in GetScore: {e}")
+            return vote_pb2.ScoreResponse(
+                post_id=request.post_id, score=0, upvotes=0, downvotes=0
+            )
         finally:
             db.close()
 
@@ -85,29 +115,40 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
     ) -> vote_pb2.GetScoresResponse:
         db = SessionLocal()
         try:
+            p_ids = [int(pid) for pid in request.post_ids]
             results = (
                 db.query(
                     Vote.post_id,
                     func.sum(Vote.score).label("score"),
-                    func.count(Vote.score).filter(Vote.score == 1).label("upvotes"),
-                    func.count(Vote.score).filter(Vote.score == -1).label("downvotes"),
+                    func.sum(case((Vote.score == 1, 1), else_=0)).label("upvotes"),
+                    func.sum(case((Vote.score == -1, 1), else_=0)).label("downvotes"),
                 )
-                .filter(Vote.post_id.in_(request.post_ids))
+                .filter(Vote.post_id.in_(p_ids))
                 .group_by(Vote.post_id)
                 .all()
             )
 
-            score_map = {r.post_id: r for r in results}
-            scores = [
-                vote_pb2.ScoreResponse(
-                    score=score_map[pid].score if pid in score_map else 0,
-                    upvotes=score_map[pid].upvotes if pid in score_map else 0,
-                    downvotes=score_map[pid].downvotes if pid in score_map else 0,
-                )
-                for pid in request.post_ids
-            ]
+            score_map = {str(r.post_id): r for r in results}
+            scores = []
+            for pid in request.post_ids:
+                if pid in score_map:
+                    r = score_map[pid]
+                    scores.append(
+                        vote_pb2.PostScore(
+                            post_id=pid,
+                            score=int(r.score or 0),
+                            upvotes=int(r.upvotes or 0),
+                            downvotes=int(r.downvotes or 0),
+                        )
+                    )
+                else:
+                    scores.append(
+                        vote_pb2.PostScore(post_id=pid, score=0, upvotes=0, downvotes=0)
+                    )
+
             return vote_pb2.GetScoresResponse(scores=scores)
-        except Exception:
+        except Exception as e:
+            print(f"Error in GetScores: {e}")
             return vote_pb2.GetScoresResponse(scores=[])
         finally:
             db.close()
@@ -117,26 +158,30 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
     ) -> vote_pb2.UserVoteResponse:
         db = SessionLocal()
         try:
+            p_id = int(request.post_id)
+            u_id = int(request.user_id)
+
             vote = (
                 db.query(Vote)
                 .filter(
-                    Vote.post_id == request.post_id,
-                    Vote.user_id == request.user_id,
+                    Vote.post_id == p_id,
+                    Vote.user_id == u_id,
                 )
                 .first()
             )
             if vote:
-                return vote_pb2.UserVoteResponse(voted=True, score=vote.score)
-            return vote_pb2.UserVoteResponse(voted=False, score=0)
-        except Exception:
-            return vote_pb2.UserVoteResponse(voted=False, score=0)
+                return vote_pb2.UserVoteResponse(voted=True, value=vote.score)
+            return vote_pb2.UserVoteResponse(voted=False, value=0)
+        except Exception as e:
+            print(f"Error in GetUserVote: {e}")
+            return vote_pb2.UserVoteResponse(voted=False, value=0)
         finally:
             db.close()
 
 
 if __name__ == "__main__":
     init_db()
-    port = "5000"
+    port = os.getenv("PORT", "5000")
     print(f"Vote Service listening on port {port}")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     vote_pb2_grpc.add_VoteServiceServicer_to_server(VoteService(), server)
