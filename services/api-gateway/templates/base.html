@@ -4,35 +4,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Forum{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>{% block title %}Dist-Redd{% endblock %}</title>
+    <!-- Pico.css for instant, clean styling without custom CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        /* Minimal tweaks for the nav layout */
+        nav { border-bottom: 1px solid var(--pico-muted-border-color); margin-bottom: 2rem; }
+        .flash { padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; border: 1px solid var(--pico-muted-border-color); }
+        .flash-error { color: white; background-color: #e74c3c; border-color: #c0392b; }
+        .flash-success { color: white; background-color: #2ecc71; border-color: #27ae60; }
+        .vote-col { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            margin-right: 1.5rem;
+            padding: 0;
+            border: none;
+        }
+        .vote-btn { 
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-size: 1rem !important;
+            color: var(--pico-muted-color) !important;
+            cursor: pointer;
+            width: auto !important;
+            height: auto !important;
+            box-shadow: none !important;
+        }
+        .vote-btn:hover { color: var(--pico-primary-color) !important; }
+        .vote-up.active { color: #ff4500 !important; }
+        .vote-down.active { color: #7193ff !important; }
+        .vote-score { font-weight: bold; font-size: 1rem; margin: 0.2rem 0; }
+        .feed-item { margin-bottom: 0.5rem; border: 1px solid var(--pico-muted-border-color); }
+        .post-content { padding-left: 0.5rem; }
+    </style>
 </head>
 
 <body>
 
-    <nav>
+    <nav class="container">
+        <ul>
+            <li><strong><a href="{{ url_for('feed.home') }}" class="contrast">Dist-Redd</a></strong></li>
+        </ul>
         <ul>
             <li><a href="{{ url_for('feed.home') }}">Home</a></li>
             <li><a href="{{ url_for('subreddit.create_subreddit_form') }}">Create Subreddit</a></li>
+            {% if g.token %}
+            <li><a href="{{ url_for('post.create_post_form') }}" class="outline" role="button">+ Post</a></li>
+            <li>
+                <details class="dropdown">
+                    <summary>Welcome, {{ g.username }}</summary>
+                    <ul dir="rtl">
+                        <li>
+                            <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0; padding:0;">
+                                <button type="submit" class="secondary outline" style="width:100%; border:none; text-align:left;">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </details>
+            </li>
+            {% else %}
+            <li><a href="{{ url_for('auth.login_form') }}">Login</a></li>
+            <li><a href="{{ url_for('auth.register_form') }}" role="button">Register</a></li>
+            {% endif %}
         </ul>
-
-        {% if g.token %}
-        <div class="user-info">
-            Welcome, {{ g.username }}!
-            <a href="{{ url_for('post.create_post_form') }}">+ Post</a>
-            <form method="POST" action="{{ url_for('auth.logout') }}" style="display: inline;">
-                <button type="submit">Logout</button>
-            </form>
-        </div>
-        {% else %}
-        <div class="login-prompt">
-            <a href="{{ url_for('auth.login_form') }}">Login</a>
-            <a href="{{ url_for('auth.register_form') }}">Register</a>
-        </div>
-        {% endif %}
     </nav>
 
-    <main>
+    <main class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
         <div class="flash flash-{{ category }}">{{ message }}</div>

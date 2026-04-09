@@ -12,7 +12,7 @@
         <select id="subreddit" name="subreddit" required>
             <option value="">Select a subreddit</option>
             {% for subreddit in subreddits %}
-            <option value="{{ subreddit.name }}">{{ subreddit.name }}</option>
+            <option value="{{ subreddit.name }}" {% if request.args.get('subreddit') == subreddit.name %}selected{% endif %}>{{ subreddit.name }}</option>
             {% endfor %}
         </select>
     </div>
