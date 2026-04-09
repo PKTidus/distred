@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import os
 from flask import Flask
 from blueprints.auth import auth_bp
 from blueprints.feed import feed_bp
@@ -8,6 +9,7 @@ from blueprints.vote import vote_bp
 
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
 
 app.register_blueprint(feed_bp)
 app.register_blueprint(auth_bp, url_prefix="/auth")
