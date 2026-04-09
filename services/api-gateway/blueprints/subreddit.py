@@ -27,5 +27,5 @@ def create_subreddit():
         flash(f"Error creating subreddit: {response.error}")
         return redirect(url_for("subreddit.create_subreddit_form"))
 
-    # Usually redirect to the subreddit feed
+    # Redirect to the subreddit feed
     return redirect(url_for("feed.subreddit", slug=response.name))
