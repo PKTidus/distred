@@ -5,6 +5,7 @@ from time import time
 import logging
 import hashlib
 import os
+from typing import Optional
 from flask import json, request
 
 import jwt
@@ -37,7 +38,7 @@ def _cache_key(token: str) -> str:
     return f"{CACHE_KEY_PREFIX}{digest}"
 
 
-def _token_ttl_seconds(token: str) -> int | None:
+def _token_ttl_seconds(token: str) -> Optional[int]:
     try:
         payload = jwt.decode(token, options={"verify_signature": False})
         exp = payload.get("exp")
@@ -47,9 +48,6 @@ def _token_ttl_seconds(token: str) -> int | None:
         return ttl if ttl > 0 else None
     except Exception:
         return None
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -62,7 +60,7 @@ def evict_cache(token: str) -> None:
         logger.warning("Redis delete error, cache may be stale: %s", e)
 
 
-def get_cached_result(token: str) -> dict | None:
+def get_cached_result(token: str) -> Optional[dict]:
     try:
         raw = redis_client.get(_cache_key(token))
         if raw:

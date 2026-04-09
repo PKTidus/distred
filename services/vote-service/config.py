@@ -15,11 +15,12 @@ url_object = URL.create(
     "postgresql+psycopg2",
     username=DB_USER,
     password=DB_PASSWORD,
-    host=DB_HOST + ":" + DB_PORT,
+    host=DB_HOST,
+    port=int(DB_PORT),
     database=DB_NAME,
 )
 
-engine = create_engine(url_object, connect_args={"check_same_thread": False})
+engine = create_engine(url_object)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

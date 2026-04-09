@@ -1,4 +1,5 @@
 from functools import wraps
+from typing import Optional
 
 from flask import g, jsonify, request
 
@@ -6,7 +7,7 @@ from clients.user_client import validate_token
 import redis_cache as cache
 
 
-def extract_bearer_token() -> str | None:
+def extract_bearer_token() -> Optional[str]:
     auth_header = request.headers.get("Authorization", "")
     if auth_header.startswith("Bearer "):
         return auth_header[len("Bearer ") :]

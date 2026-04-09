@@ -24,24 +24,45 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - user-service-db
+    environment:
+      - DB_HOST=user-service-db
+      - DB_NAME=user_service
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
   post-service:
     build:
       context: ./services/post-service
       dockerfile: Dockerfile
     depends_on:
       - post-service-db
+    environment:
+      - DB_HOST=post-service-db
+      - DB_NAME=post_service
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+
   subreddit-service:
     build:
       context: ./services/subreddit-service
       dockerfile: Dockerfile
     depends_on:
       - subreddit-service-db
+    environment:
+      - DB_HOST=subreddit-service-db
+      - DB_NAME=subreddit_service
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
   vote-service:
     build:
       context: ./services/vote-service
       dockerfile: Dockerfile
     depends_on:
       - vote-service-db
+    environment:
+      - DB_HOST=vote-service-db
+      - DB_NAME=vote_service
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
 
   gateway-cache:
     image: redis:latest
@@ -52,6 +73,7 @@ services:
     environment:
       POSTGRES_DB: user_service
       POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     volumes:
       - user_db_data:/var/lib/postgresql
     healthcheck:
@@ -64,6 +86,7 @@ services:
     environment:
       POSTGRES_DB: post_service
       POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     volumes:
       - post_db_data:/var/lib/postgresql
     healthcheck:
@@ -76,6 +99,7 @@ services:
     environment:
       POSTGRES_DB: subreddit_service
       POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     volumes:
       - subreddit_db_data:/var/lib/postgresql
     healthcheck:
@@ -88,6 +112,7 @@ services:
     environment:
       POSTGRES_DB: vote_service
       POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     volumes:
       - vote_db_data:/var/lib/postgresql
     healthcheck:

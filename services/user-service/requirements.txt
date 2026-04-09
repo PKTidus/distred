@@ -5,4 +5,5 @@ typing-extensions==4.15.0
 grpcio-tools==1.78.0
 protobuf==6.33.5
 pyjwt==2.11.0
-pwdlib==0.3.0
+pwdlib==0.2.1
+pwdlib[argon2]
