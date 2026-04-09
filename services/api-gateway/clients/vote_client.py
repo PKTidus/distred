@@ -4,7 +4,7 @@ import os
 from generated import vote_pb2, vote_pb2_grpc
 
 VOTE_SERVICE_HOST = os.getenv("VOTE_SERVICE_HOST", "localhost")
-VOTE_SERVICE_PORT = os.getenv("VOTE_SERVICE_PORT", "5000")
+VOTE_SERVICE_PORT = os.getenv("VOTE_SERVICE_PORT", "50051")
 
 
 def get_channel():

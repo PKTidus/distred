@@ -33,7 +33,7 @@ class HealthCheckService(health_check_pb2_grpc.HealthCheckServiceServicer):
 if __name__ == "__main__":
     threading.Thread(target=update_metrics, daemon=True).start()
     print("Health Check Service listening on port 5000...")
-    port = "5000"
+    port = "50051"
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     health_check_pb2_grpc.add_HealthCheckServiceServicer_to_server(
         HealthCheckService(), server

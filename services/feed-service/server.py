@@ -6,7 +6,7 @@ from generated import post_pb2, post_pb2_grpc
 
 
 POST_SERVICE_HOST = os.getenv("POST_SERVICE_HOST", "localhost")
-POST_SERVICE_PORT = os.getenv("POST_SERVICE_PORT", "5000")
+POST_SERVICE_PORT = os.getenv("POST_SERVICE_PORT", "50051")
 
 
 class FeedService(feed_pb2_grpc.FeedServiceServicer):
@@ -21,7 +21,8 @@ class FeedService(feed_pb2_grpc.FeedServiceServicer):
                 subreddit="",
                 limit=request.limit,
                 offset=request.offset,
-                user_id=request.user_id
+                user_id=request.user_id,
+                sort=request.sort
             )
             post_response = post_stub.ListPosts(post_request)
             
@@ -50,7 +51,8 @@ class FeedService(feed_pb2_grpc.FeedServiceServicer):
                 subreddit=request.subreddit,
                 limit=request.limit,
                 offset=request.offset,
-                user_id=request.user_id
+                user_id=request.user_id,
+                sort=request.sort
             )
             post_response = post_stub.ListPosts(post_request)
             
@@ -74,7 +76,7 @@ class FeedService(feed_pb2_grpc.FeedServiceServicer):
 
 
 if __name__ == "__main__":
-    port = os.getenv("PORT", "5000")
+    port = os.getenv("PORT", "50051")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     feed_pb2_grpc.add_FeedServiceServicer_to_server(FeedService(), server)
     server.add_insecure_port("[::]:" + port)

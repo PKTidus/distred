@@ -9,9 +9,9 @@ from db import Post
 
 
 USER_SERVICE_HOST = os.getenv("USER_SERVICE_HOST", "localhost")
-USER_SERVICE_PORT = os.getenv("USER_SERVICE_PORT", "5000")
+USER_SERVICE_PORT = os.getenv("USER_SERVICE_PORT", "50051")
 VOTE_SERVICE_HOST = os.getenv("VOTE_SERVICE_HOST", "localhost")
-VOTE_SERVICE_PORT = os.getenv("VOTE_SERVICE_PORT", "5000")
+VOTE_SERVICE_PORT = os.getenv("VOTE_SERVICE_PORT", "50051")
 
 
 class PostService(post_pb2_grpc.PostServiceServicer):
@@ -186,8 +186,9 @@ class PostService(post_pb2_grpc.PostServiceServicer):
         try:
             post = db.query(Post).filter(Post.id == int(request.post_id)).first()
             if not post:
-                return post_pb2.DeletePostResponse(success=False, error="Post not found")
-
+                return post_pb2.DeletePostResponse(
+                    success=False, error="Post not found"
+                )
             if post.author_id != request.author_id:
                 return post_pb2.DeletePostResponse(success=False, error="Unauthorized")
 
@@ -206,7 +207,6 @@ class PostService(post_pb2_grpc.PostServiceServicer):
             post = db.query(Post).filter(Post.id == int(request.post_id)).first()
             if not post:
                 return post_pb2.UpdateScoreResponse(success=False)
-            
             post.score = request.new_score
             db.commit()
             return post_pb2.UpdateScoreResponse(success=True)
@@ -218,7 +218,7 @@ class PostService(post_pb2_grpc.PostServiceServicer):
 
 
 if __name__ == "__main__":
-    port = os.getenv("PORT", "5000")
+    port = os.getenv("PORT", "50051")
     init_db()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     post_pb2_grpc.add_PostServiceServicer_to_server(PostService(), server)

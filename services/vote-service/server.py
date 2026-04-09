@@ -9,7 +9,7 @@ from config import SessionLocal, init_db
 
 
 POST_SERVICE_HOST = os.getenv("POST_SERVICE_HOST", "localhost")
-POST_SERVICE_PORT = os.getenv("POST_SERVICE_PORT", "5000")
+POST_SERVICE_PORT = os.getenv("POST_SERVICE_PORT", "50051")
 
 
 class VoteService(vote_pb2_grpc.VoteServiceServicer):
@@ -146,7 +146,7 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
 
 if __name__ == "__main__":
     init_db()
-    port = os.getenv("PORT", "5000")
+    port = os.getenv("PORT", "50051")
     print(f"Vote Service listening on port {port}")
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     vote_pb2_grpc.add_VoteServiceServicer_to_server(VoteService(), server)

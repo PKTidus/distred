@@ -85,7 +85,7 @@ class SubredditService(subreddit_pb2_grpc.SubredditServiceServicer):
 
 
 if __name__ == "__main__":
-    port = os.getenv("PORT", "5000")
+    port = os.getenv("PORT", "50051")
     init_db()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     subreddit_pb2_grpc.add_SubredditServiceServicer_to_server(

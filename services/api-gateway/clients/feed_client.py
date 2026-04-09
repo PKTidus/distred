@@ -4,7 +4,7 @@ import os
 from generated import feed_pb2, feed_pb2_grpc
 
 FEED_SERVICE_HOST = os.getenv("FEED_SERVICE_HOST", "localhost")
-FEED_SERVICE_PORT = os.getenv("FEED_SERVICE_PORT", "5000")
+FEED_SERVICE_PORT = os.getenv("FEED_SERVICE_PORT", "50051")
 
 
 def get_channel():

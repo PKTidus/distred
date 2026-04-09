@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:8000
+      - 50051:50051 # healthcheck port for the load balancer
     volumes:
       - ./services/api-gateway:/app
     depends_on:
@@ -16,15 +17,15 @@ services:
       - gateway-cache
     environment:
       - USER_SERVICE_HOST=user-service
-      - USER_SERVICE_PORT=5000
+      - USER_SERVICE_PORT=50051
       - POST_SERVICE_HOST=post-service
-      - POST_SERVICE_PORT=5000
+      - POST_SERVICE_PORT=50051
       - SUBREDDIT_SERVICE_HOST=subreddit-service
-      - SUBREDDIT_SERVICE_PORT=5000
+      - SUBREDDIT_SERVICE_PORT=50051
       - VOTE_SERVICE_HOST=vote-service
-      - VOTE_SERVICE_PORT=5000
+      - VOTE_SERVICE_PORT=50051
       - FEED_SERVICE_HOST=feed-service
-      - FEED_SERVICE_PORT=5000
+      - FEED_SERVICE_PORT=50051
       - REDIS_HOST=gateway-cache
       - REDIS_PORT=6379
       - SECRET_KEY=dev-secret-key
@@ -39,8 +40,8 @@ services:
       - post-service
     environment:
       - POST_SERVICE_HOST=post-service
-      - POST_SERVICE_PORT=5000
-      - PORT=5000
+      - POST_SERVICE_PORT=50051
+      - PORT=50051
 
   user-service:
     build:
@@ -55,7 +56,7 @@ services:
       - DB_NAME=user_service
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - PORT=5000
+      - PORT=50051
 
   post-service:
     build:
@@ -73,10 +74,10 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - USER_SERVICE_HOST=user-service
-      - USER_SERVICE_PORT=5000
+      - USER_SERVICE_PORT=50051
       - VOTE_SERVICE_HOST=vote-service
-      - VOTE_SERVICE_PORT=5000
-      - PORT=5000
+      - VOTE_SERVICE_PORT=50051
+      - PORT=50051
 
   subreddit-service:
     build:
@@ -91,7 +92,7 @@ services:
       - DB_NAME=subreddit_service
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - PORT=5000
+      - PORT=50051
 
   vote-service:
     build:
@@ -107,8 +108,8 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - POST_SERVICE_HOST=post-service
-      - POST_SERVICE_PORT=5000
-      - PORT=5000
+      - POST_SERVICE_PORT=50051
+      - PORT=50051
 
   gateway-cache:
     image: redis:latest

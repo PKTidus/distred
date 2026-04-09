@@ -120,7 +120,7 @@ class UserService(user_pb2_grpc.UserServiceServicer):
 
 
 if __name__ == "__main__":
-    port = "5000"
+    port = "50051"
     init_db()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     user_pb2_grpc.add_UserServiceServicer_to_server(UserService(), server)
