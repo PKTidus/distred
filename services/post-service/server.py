@@ -1,5 +1,7 @@
 import os
+import time
 from concurrent import futures
+from sqlalchemy import func, cast, Float
 import grpc
 from generated import post_pb2, post_pb2_grpc
 from generated import user_pb2, user_pb2_grpc
@@ -50,7 +52,7 @@ class PostService(post_pb2_grpc.PostServiceServicer):
             db.refresh(post)
 
             username = self._get_username(post.author_id)
-            
+
             # Automatically upvote
             try:
                 vote_stub = self._get_vote_stub()
@@ -127,18 +129,26 @@ class PostService(post_pb2_grpc.PostServiceServicer):
                 query = query.filter(Post.subreddit == request.subreddit)
 
             total = query.count()
-            posts = query.order_by(Post.created_at.desc()).offset(request.offset).limit(request.limit).all()
 
-            # Batch fetch scores
-            post_ids = [str(p.id) for p in posts]
-            scores_dict = {}
-            try:
-                vote_stub = self._get_vote_stub()
-                scores_resp = vote_stub.GetScores(vote_pb2.GetScoresRequest(post_ids=post_ids))
-                for ps in scores_resp.scores:
-                    scores_dict[ps.post_id] = ps.score
-            except Exception:
-                pass
+            if request.sort == "top":
+                query = query.order_by(Post.score.desc(), Post.created_at.desc())
+            elif request.sort == "hot":
+                # https://news.ycombinator.com/item?id=1782130
+                # Hacker News formula: score / (hours_since_post + 2) ^ 1.5
+                now = int(time.time())
+                # Use SQL expressions for calculation
+                # created_at is a Unix timestamp (bigint)
+                seconds_old = now - Post.created_at
+                hours_old = seconds_old / 3600.0
+                gravity = 1.5
+                hot_score = (cast(Post.score, Float) - 1) / func.pow(
+                    hours_old + 2, gravity
+                )
+                query = query.order_by(hot_score.desc())
+            else:  # "new" or default
+                query = query.order_by(Post.created_at.desc())
+
+            posts = query.offset(request.offset).limit(request.limit).all()
 
             # Cache usernames for this request
             author_usernames = {}
@@ -150,9 +160,11 @@ class PostService(post_pb2_grpc.PostServiceServicer):
                 if request.user_id != 0:
                     try:
                         vote_stub = self._get_vote_stub()
-                        uv_resp = vote_stub.GetUserVote(vote_pb2.GetUserVoteRequest(
-                            post_id=p_id_str, user_id=str(request.user_id)
-                        ))
+                        uv_resp = vote_stub.GetUserVote(
+                            vote_pb2.GetUserVoteRequest(
+                                post_id=p_id_str, user_id=str(request.user_id)
+                            )
+                        )
                         u_vote = uv_resp.value
                     except Exception:
                         pass
@@ -160,17 +172,19 @@ class PostService(post_pb2_grpc.PostServiceServicer):
                 if p.author_id not in author_usernames:
                     author_usernames[p.author_id] = self._get_username(p.author_id)
 
-                res_posts.append(post_pb2.PostResponse(
-                    post_id=p_id_str,
-                    title=p.title,
-                    body=p.body or "",
-                    subreddit=p.subreddit,
-                    author_id=p.author_id,
-                    username=author_usernames[p.author_id],
-                    score=scores_dict.get(p_id_str, 0),
-                    user_vote=u_vote,
-                    created_at=p.created_at,
-                ))
+                res_posts.append(
+                    post_pb2.PostResponse(
+                        post_id=p_id_str,
+                        title=p.title,
+                        body=p.body or "",
+                        subreddit=p.subreddit,
+                        author_id=p.author_id,
+                        username=author_usernames[p.author_id],
+                        score=p.score or 0,
+                        user_vote=u_vote,
+                        created_at=p.created_at,
+                    )
+                )
 
             return post_pb2.ListPostsResponse(posts=res_posts, total=total)
         finally:
