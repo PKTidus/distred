@@ -44,11 +44,6 @@ class VoteServiceStub(object):
                 request_serializer=vote__pb2.RemoveVoteRequest.SerializeToString,
                 response_deserializer=vote__pb2.VoteResponse.FromString,
                 _registered_method=True)
-        self.GetScore = channel.unary_unary(
-                '/vote.VoteService/GetScore',
-                request_serializer=vote__pb2.GetScoreRequest.SerializeToString,
-                response_deserializer=vote__pb2.ScoreResponse.FromString,
-                _registered_method=True)
         self.GetUserVote = channel.unary_unary(
                 '/vote.VoteService/GetUserVote',
                 request_serializer=vote__pb2.GetUserVoteRequest.SerializeToString,
@@ -66,12 +61,6 @@ class VoteServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def RemoveVote(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetScore(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -96,11 +85,6 @@ def add_VoteServiceServicer_to_server(servicer, server):
                     servicer.RemoveVote,
                     request_deserializer=vote__pb2.RemoveVoteRequest.FromString,
                     response_serializer=vote__pb2.VoteResponse.SerializeToString,
-            ),
-            'GetScore': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetScore,
-                    request_deserializer=vote__pb2.GetScoreRequest.FromString,
-                    response_serializer=vote__pb2.ScoreResponse.SerializeToString,
             ),
             'GetUserVote': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUserVote,
@@ -162,33 +146,6 @@ class VoteService(object):
             '/vote.VoteService/RemoveVote',
             vote__pb2.RemoveVoteRequest.SerializeToString,
             vote__pb2.VoteResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def GetScore(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/vote.VoteService/GetScore',
-            vote__pb2.GetScoreRequest.SerializeToString,
-            vote__pb2.ScoreResponse.FromString,
             options,
             channel_credentials,
             insecure,

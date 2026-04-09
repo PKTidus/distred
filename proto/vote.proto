@@ -5,7 +5,6 @@ package vote;
 service VoteService {
   rpc CastVote    (CastVoteRequest)    returns (VoteResponse);
   rpc RemoveVote  (RemoveVoteRequest)  returns (VoteResponse);
-  rpc GetScore    (GetScoreRequest)    returns (ScoreResponse);
   rpc GetUserVote (GetUserVoteRequest) returns (UserVoteResponse);   // did this user vote on this post?
 }
 
@@ -18,10 +17,6 @@ message CastVoteRequest {
 message RemoveVoteRequest {
   string post_id = 1;
   string user_id = 2;
-}
-
-message GetScoreRequest {
-  string post_id = 1;
 }
 
 message GetUserVoteRequest {

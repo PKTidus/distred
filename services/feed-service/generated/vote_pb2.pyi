@@ -22,12 +22,6 @@ class RemoveVoteRequest(_message.Message):
     user_id: str
     def __init__(self, post_id: _Optional[str] = ..., user_id: _Optional[str] = ...) -> None: ...
 
-class GetScoreRequest(_message.Message):
-    __slots__ = ("post_id",)
-    POST_ID_FIELD_NUMBER: _ClassVar[int]
-    post_id: str
-    def __init__(self, post_id: _Optional[str] = ...) -> None: ...
-
 class GetUserVoteRequest(_message.Message):
     __slots__ = ("post_id", "user_id")
     POST_ID_FIELD_NUMBER: _ClassVar[int]

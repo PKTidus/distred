@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nvote.proto\x12\x04vote\"B\n\x0f\x43\x61stVoteRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x0f\n\x07user_id\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x05\"5\n\x11RemoveVoteRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x0f\n\x07user_id\x18\x02 \x01(\t\"\"\n\x0fGetScoreRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\"6\n\x12GetUserVoteRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x0f\n\x07user_id\x18\x02 \x01(\t\"2\n\x0cVoteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x11\n\tnew_score\x18\x02 \x01(\x05\"S\n\rScoreResponse\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05score\x18\x02 \x01(\x05\x12\x0f\n\x07upvotes\x18\x03 \x01(\x05\x12\x11\n\tdownvotes\x18\x04 \x01(\x05\"O\n\tPostScore\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05score\x18\x02 \x01(\x05\x12\x0f\n\x07upvotes\x18\x03 \x01(\x05\x12\x11\n\tdownvotes\x18\x04 \x01(\x05\"0\n\x10UserVoteResponse\x12\r\n\x05voted\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\x05\x32\xf8\x01\n\x0bVoteService\x12\x35\n\x08\x43\x61stVote\x12\x15.vote.CastVoteRequest\x1a\x12.vote.VoteResponse\x12\x39\n\nRemoveVote\x12\x17.vote.RemoveVoteRequest\x1a\x12.vote.VoteResponse\x12\x36\n\x08GetScore\x12\x15.vote.GetScoreRequest\x1a\x13.vote.ScoreResponse\x12?\n\x0bGetUserVote\x12\x18.vote.GetUserVoteRequest\x1a\x16.vote.UserVoteResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nvote.proto\x12\x04vote\"B\n\x0f\x43\x61stVoteRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x0f\n\x07user_id\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x05\"5\n\x11RemoveVoteRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x0f\n\x07user_id\x18\x02 \x01(\t\"6\n\x12GetUserVoteRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\x0f\n\x07user_id\x18\x02 \x01(\t\"2\n\x0cVoteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x11\n\tnew_score\x18\x02 \x01(\x05\"S\n\rScoreResponse\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05score\x18\x02 \x01(\x05\x12\x0f\n\x07upvotes\x18\x03 \x01(\x05\x12\x11\n\tdownvotes\x18\x04 \x01(\x05\"O\n\tPostScore\x12\x0f\n\x07post_id\x18\x01 \x01(\t\x12\r\n\x05score\x18\x02 \x01(\x05\x12\x0f\n\x07upvotes\x18\x03 \x01(\x05\x12\x11\n\tdownvotes\x18\x04 \x01(\x05\"0\n\x10UserVoteResponse\x12\r\n\x05voted\x18\x01 \x01(\x08\x12\r\n\x05value\x18\x02 \x01(\x05\x32\xc0\x01\n\x0bVoteService\x12\x35\n\x08\x43\x61stVote\x12\x15.vote.CastVoteRequest\x1a\x12.vote.VoteResponse\x12\x39\n\nRemoveVote\x12\x17.vote.RemoveVoteRequest\x1a\x12.vote.VoteResponse\x12?\n\x0bGetUserVote\x12\x18.vote.GetUserVoteRequest\x1a\x16.vote.UserVoteResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,18 +35,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_CASTVOTEREQUEST']._serialized_end=86
   _globals['_REMOVEVOTEREQUEST']._serialized_start=88
   _globals['_REMOVEVOTEREQUEST']._serialized_end=141
-  _globals['_GETSCOREREQUEST']._serialized_start=143
-  _globals['_GETSCOREREQUEST']._serialized_end=177
-  _globals['_GETUSERVOTEREQUEST']._serialized_start=179
-  _globals['_GETUSERVOTEREQUEST']._serialized_end=233
-  _globals['_VOTERESPONSE']._serialized_start=235
-  _globals['_VOTERESPONSE']._serialized_end=285
-  _globals['_SCORERESPONSE']._serialized_start=287
-  _globals['_SCORERESPONSE']._serialized_end=370
-  _globals['_POSTSCORE']._serialized_start=372
-  _globals['_POSTSCORE']._serialized_end=451
-  _globals['_USERVOTERESPONSE']._serialized_start=453
-  _globals['_USERVOTERESPONSE']._serialized_end=501
-  _globals['_VOTESERVICE']._serialized_start=504
-  _globals['_VOTESERVICE']._serialized_end=752
+  _globals['_GETUSERVOTEREQUEST']._serialized_start=143
+  _globals['_GETUSERVOTEREQUEST']._serialized_end=197
+  _globals['_VOTERESPONSE']._serialized_start=199
+  _globals['_VOTERESPONSE']._serialized_end=249
+  _globals['_SCORERESPONSE']._serialized_start=251
+  _globals['_SCORERESPONSE']._serialized_end=334
+  _globals['_POSTSCORE']._serialized_start=336
+  _globals['_POSTSCORE']._serialized_end=415
+  _globals['_USERVOTERESPONSE']._serialized_start=417
+  _globals['_USERVOTERESPONSE']._serialized_end=465
+  _globals['_VOTESERVICE']._serialized_start=468
+  _globals['_VOTESERVICE']._serialized_end=660
 # @@protoc_insertion_point(module_scope)

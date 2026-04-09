@@ -118,24 +118,6 @@ class VoteService(vote_pb2_grpc.VoteServiceServicer):
         finally:
             db.close()
 
-    def GetScore(self, request: vote_pb2.GetScoreRequest, context):
-        db = SessionLocal()
-        try:
-            score, upvotes, downvotes = self._get_post_score(db, request.post_id)
-            return vote_pb2.ScoreResponse(
-                post_id=request.post_id,
-                score=score,
-                upvotes=upvotes,
-                downvotes=downvotes,
-            )
-        except Exception as e:
-            print(f"Error in GetScore: {e}")
-            return vote_pb2.ScoreResponse(
-                post_id=request.post_id, score=0, upvotes=0, downvotes=0
-            )
-        finally:
-            db.close()
-
     def GetUserVote(
         self, request: vote_pb2.GetUserVoteRequest, context
     ) -> vote_pb2.UserVoteResponse:

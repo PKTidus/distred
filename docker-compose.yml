@@ -106,6 +106,8 @@ services:
       - DB_NAME=vote_service
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - POST_SERVICE_HOST=post-service
+      - POST_SERVICE_PORT=5000
       - PORT=5000
 
   gateway-cache:
@@ -161,8 +163,6 @@ services:
       POSTGRES_DB: vote_service
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-      POST_SERVICE_HOST: post-service
-      POST_SERVICE_PORT: 5000
     volumes:
       - vote_db_data:/var/lib/postgresql
     healthcheck:
