@@ -1,0 +1,84 @@
+all:
+  vars:
+    ansible_ssh_private_key_file: ~/.ssh/gcp-ansible-key
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o ProxyCommand='gcloud compute start-iap-tunnel %h 22 --listen-on-stdin --zone=us-west3-a --project=distributed-systems-487323'"
+    ansible_user: hamad
+  children:
+    load_balancers:
+      hosts:
+        load-balancer-go:
+          service: load-balancer
+          service_ports:
+            - "80:8000"
+        load-balancer-nginx:
+          service: nginx-lb
+          service_ports:
+            - "80:80"
+          container_env:
+            BACKENDS: "server api-gateway-0:8000; server api-gateway-1:8000; server api-gateway-2:8000;"
+
+    gateways:
+      vars:
+        container_env:
+          USER_SERVICE_HOST: "user-service"
+          USER_SERVICE_PORT: "50051"
+          POST_SERVICE_HOST: "post-service"
+          POST_SERVICE_PORT: "50051"
+          SUBREDDIT_SERVICE_HOST: "subreddit-service"
+          SUBREDDIT_SERVICE_PORT: "50051"
+          VOTE_SERVICE_HOST: "vote-service"
+          VOTE_SERVICE_PORT: "50051"
+          FEED_SERVICE_HOST: "feed-service"
+          FEED_SERVICE_PORT: "50051"
+          REDIS_HOST: "gateway-cache"
+          REDIS_PORT: "6379"
+          SECRET_KEY: "prod-secret-key"
+      hosts:
+        api-gateway-0:
+          service: api-gateway
+          service_ports: ["80:8000", "50051:50051"]
+        api-gateway-1:
+          service: api-gateway
+          service_ports: ["80:8000", "50051:50051"]
+        api-gateway-2:
+          service: api-gateway
+          service_ports: ["80:8000", "50051:50051"]
+
+    backend_services:
+      hosts:
+        user-service:
+          service: user-service
+          service_ports: ["50051:50051"]
+          service_volumes: ["user_db_data:/data"]
+        post-service:
+          service: post-service
+          service_ports: ["50051:50051"]
+          service_volumes: ["post_db_data:/data"]
+          container_env:
+            USER_SERVICE_HOST: "user-service"
+            USER_SERVICE_PORT: "50051"
+            VOTE_SERVICE_HOST: "vote-service"
+            VOTE_SERVICE_PORT: "50051"
+        subreddit-service:
+          service: subreddit-service
+          service_ports: ["50051:50051"]
+          service_volumes: ["subreddit_db_data:/data"]
+        vote-service:
+          service: vote-service
+          service_ports: ["50051:50051"]
+          service_volumes: ["vote_db_data:/data"]
+          container_env:
+            POST_SERVICE_HOST: "post-service"
+            POST_SERVICE_PORT: "50051"
+        feed-service:
+          service: feed-service
+          service_ports: ["50051:50051"]
+          container_env:
+            POST_SERVICE_HOST: "post-service"
+            POST_SERVICE_PORT: "50051"
+
+    infrastructure:
+      hosts:
+        gateway-cache:
+          service: gateway-cache
+          service_ports: ["6379:6379"]
