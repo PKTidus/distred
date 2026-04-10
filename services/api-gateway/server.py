@@ -14,15 +14,16 @@ import time
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
 
-@app.template_filter('humanize')
+
+@app.template_filter("humanize")
 def humanize_time(timestamp):
     """Convert a timestamp to a human-readable string like '2 hours ago'."""
     if not timestamp:
         return ""
-    
+
     now = int(time.time())
     diff = now - timestamp
-    
+
     if diff < 60:
         return "just now"
     elif diff < 3600:
@@ -32,7 +33,8 @@ def humanize_time(timestamp):
     elif diff < 604800:
         return f"{diff // 86400}d ago"
     else:
-        return datetime.fromtimestamp(timestamp).strftime('%b %d, %Y')
+        return datetime.fromtimestamp(timestamp).strftime("%b %d, %Y")
+
 
 app.register_blueprint(feed_bp)
 app.register_blueprint(auth_bp, url_prefix="/auth")

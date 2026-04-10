@@ -1,11 +1,8 @@
 services:
-  api-gateway-2:
+  api-gateway-1:
     build:
       context: ./services/api-gateway
       dockerfile: Dockerfile
-    # ports:
-    #   - 8000:8000
-    #   - 50051:50051
     volumes:
       - ./services/api-gateway:/app
     depends_on:
@@ -29,13 +26,10 @@ services:
       - REDIS_HOST=gateway-cache
       - REDIS_PORT=6379
       - SECRET_KEY=dev-secret-key
-  api-gateway-1:
+  api-gateway-2:
     build:
       context: ./services/api-gateway
       dockerfile: Dockerfile
-    # ports:
-    #   - 8000:8000
-    #   - 50051:50051
     volumes:
       - ./services/api-gateway:/app
     depends_on:
@@ -70,12 +64,14 @@ services:
       - api-gateway-1
       - api-gateway-2
 
-  load-balancer-2:
-    image: nginx:latest
+  load-balancer-nginx:
+    build:
+      context: ./services/nginx-lb
+      dockerfile: Dockerfile
     ports:
       - 8001:80
-    volumes:
-      - ./services/load-balancer/nginx.conf:/etc/nginx/conf.d/default.conf
+    environment:
+      - BACKENDS=server api-gateway-1:8000; server api-gateway-2:8000;
     depends_on:
       - api-gateway-1
       - api-gateway-2
@@ -144,7 +140,6 @@ services:
       - POST_SERVICE_HOST=post-service
       - POST_SERVICE_PORT=50051
       - PORT=50051
-
 
   gateway-cache:
     image: redis:latest
