@@ -142,6 +142,8 @@ services:
       - PORT=50051
 
   gateway-cache:
-    image: redis:latest
+    build:
+      context: ./services/gateway-cache
+      dockerfile: Dockerfile
     ports:
       - 6379:6379
