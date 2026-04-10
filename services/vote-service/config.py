@@ -5,7 +5,7 @@ import os
 
 
 DB_NAME = os.getenv("DB_NAME", "vote_service.sqlite")
-DATABASE_URL = f"sqlite:///./{DB_NAME}"
+DATABASE_URL = f"sqlite:////data/{DB_NAME}"
 
 engine = create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}

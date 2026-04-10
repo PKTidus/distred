@@ -98,6 +98,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/user-service:/app
+      - ./user_db_data:/data
     environment:
       - DB_NAME=user_service.sqlite
       - PORT=50051
@@ -108,6 +109,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/post-service:/app
+      - ./post_db_data:/data
     depends_on:
       - user-service
       - vote-service
@@ -125,6 +127,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/subreddit-service:/app
+      - ./subreddit_db_data:/data
     environment:
       - DB_NAME=subreddit_service.sqlite
       - PORT=50051
@@ -135,11 +138,13 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/vote-service:/app
+      - ./vote_db_data:/data
     environment:
       - DB_NAME=vote_service.sqlite
       - POST_SERVICE_HOST=post-service
       - POST_SERVICE_PORT=50051
       - PORT=50051
+
 
   gateway-cache:
     image: redis:latest
