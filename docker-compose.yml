@@ -98,13 +98,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/user-service:/app
-    depends_on:
-      - user-service-db
     environment:
-      - DB_HOST=user-service-db
-      - DB_NAME=user_service
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_NAME=user_service.sqlite
       - PORT=50051
 
   post-service:
@@ -114,14 +109,10 @@ services:
     volumes:
       - ./services/post-service:/app
     depends_on:
-      - post-service-db
       - user-service
       - vote-service
     environment:
-      - DB_HOST=post-service-db
-      - DB_NAME=post_service
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_NAME=post_service.sqlite
       - USER_SERVICE_HOST=user-service
       - USER_SERVICE_PORT=50051
       - VOTE_SERVICE_HOST=vote-service
@@ -134,13 +125,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/subreddit-service:/app
-    depends_on:
-      - subreddit-service-db
     environment:
-      - DB_HOST=subreddit-service-db
-      - DB_NAME=subreddit_service
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_NAME=subreddit_service.sqlite
       - PORT=50051
 
   vote-service:
@@ -149,13 +135,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/vote-service:/app
-    depends_on:
-      - vote-service-db
     environment:
-      - DB_HOST=vote-service-db
-      - DB_NAME=vote_service
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_NAME=vote_service.sqlite
       - POST_SERVICE_HOST=post-service
       - POST_SERVICE_PORT=50051
       - PORT=50051
@@ -164,65 +145,3 @@ services:
     image: redis:latest
     ports:
       - 6379:6379
-
-  user-service-db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: user_service
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    volumes:
-      - user_db_data:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  post-service-db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: post_service
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    volumes:
-      - post_db_data:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  subreddit-service-db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: subreddit_service
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    volumes:
-      - subreddit_db_data:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  vote-service-db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: vote_service
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    volumes:
-      - vote_db_data:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  user_db_data:
-  post_db_data:
-  subreddit_db_data:
-  vote_db_data:

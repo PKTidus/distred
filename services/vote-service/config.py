@@ -1,26 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.engine.url import URL
 from db import Base
 import os
 
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_USER = os.getenv("DB_USER", "user")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
-DB_NAME = os.getenv("DB_NAME", "votes_db")
+DB_NAME = os.getenv("DB_NAME", "vote_service.sqlite")
+DATABASE_URL = f"sqlite:///./{DB_NAME}"
 
-url_object = URL.create(
-    "postgresql+psycopg2",
-    username=DB_USER,
-    password=DB_PASSWORD,
-    host=DB_HOST,
-    port=int(DB_PORT),
-    database=DB_NAME,
+engine = create_engine(
+    DATABASE_URL, connect_args={"check_same_thread": False}
 )
-
-engine = create_engine(url_object)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

@@ -1,26 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.engine.url import URL
 from db import Base
 import os
 
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
-DB_NAME = os.getenv("DB_NAME", "post_service")
+DB_NAME = os.getenv("DB_NAME", "post_service.sqlite")
+DATABASE_URL = f"sqlite:///./{DB_NAME}"
 
-url_object = URL.create(
-    "postgresql+psycopg2",
-    username=DB_USER,
-    password=DB_PASSWORD,
-    host=DB_HOST,
-    port=int(DB_PORT),
-    database=DB_NAME,
+engine = create_engine(
+    DATABASE_URL, connect_args={"check_same_thread": False}
 )
-
-engine = create_engine(url_object)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
