@@ -4,7 +4,7 @@
 // - protoc             v7.34.1
 // source: health-check.proto
 
-package main
+package generated
 
 import (
 	context "context"

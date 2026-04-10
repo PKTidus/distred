@@ -24,14 +24,14 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12health-check.proto\x12\x0bhealthcheck\"\x14\n\x12HealthCheckRequest\">\n\x13HealthCheckResponse\x12\x11\n\tcpu_usage\x18\x01 \x01(\x01\x12\x14\n\x0cmemory_usage\x18\x02 \x01(\x01\x32`\n\x12HealthCheckService\x12J\n\x05\x43heck\x12\x1f.healthcheck.HealthCheckRequest\x1a .healthcheck.HealthCheckResponseB\x08Z\x06./mainb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12health-check.proto\x12\x0bhealthcheck\"\x14\n\x12HealthCheckRequest\">\n\x13HealthCheckResponse\x12\x11\n\tcpu_usage\x18\x01 \x01(\x01\x12\x14\n\x0cmemory_usage\x18\x02 \x01(\x01\x32`\n\x12HealthCheckService\x12J\n\x05\x43heck\x12\x1f.healthcheck.HealthCheckRequest\x1a .healthcheck.HealthCheckResponseB\rZ\x0b./generatedb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'health_check_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'Z\006./main'
+  _globals['DESCRIPTOR']._serialized_options = b'Z\013./generated'
   _globals['_HEALTHCHECKREQUEST']._serialized_start=35
   _globals['_HEALTHCHECKREQUEST']._serialized_end=55
   _globals['_HEALTHCHECKRESPONSE']._serialized_start=57

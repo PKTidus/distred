@@ -4,7 +4,7 @@
 // 	protoc        v7.34.1
 // source: health-check.proto
 
-package main
+package generated
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -120,7 +120,7 @@ const file_health_check_proto_rawDesc = "" +
 	"\tcpu_usage\x18\x01 \x01(\x01R\bcpuUsage\x12!\n" +
 	"\fmemory_usage\x18\x02 \x01(\x01R\vmemoryUsage2`\n" +
 	"\x12HealthCheckService\x12J\n" +
-	"\x05Check\x12\x1f.healthcheck.HealthCheckRequest\x1a .healthcheck.HealthCheckResponseB\bZ\x06./mainb\x06proto3"
+	"\x05Check\x12\x1f.healthcheck.HealthCheckRequest\x1a .healthcheck.HealthCheckResponseB\rZ\v./generatedb\x06proto3"
 
 var (
 	file_health_check_proto_rawDescOnce sync.Once

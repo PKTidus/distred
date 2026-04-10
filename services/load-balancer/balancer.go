@@ -2,74 +2,87 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"math"
 	"math/rand"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
-	"sync/atomic" // Required for atomic snapshot
 	"time"
 
-	pb "load-balancer/generated/health-check"
+	pb "github.com/hamadalghanim/distred/generated"
 
+	"gonum.org/v1/gonum/stat/distuv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type serverHealth struct {
 	IP        string
-	CPUUsage  float32
-	MemUsage  float32
+	CPUUsage  float64
+	MemUsage  float64
 	LastCheck time.Time
+	URL       *url.URL
+	IsHealthy bool
+	Mutex     sync.Mutex
 }
 
-var (
-	servers []serverHealth
-	mu      sync.RWMutex
-	// snap stores the latest []serverHealth snapshot atomically
-	snap atomic.Value
-)
+type LoadBalancer struct {
+	Mutex   sync.RWMutex
+	weights []float64
+}
 
-func GetServerIPs() []string {
+type Config struct {
+	Port                string   `json:"port"`
+	HealthCheckInterval string   `json:"healthCheckInterval"`
+	Servers             []string `json:"servers"`
+}
+
+var servers []serverHealth
+
+func loadConfig(file string) (Config, error) {
+	var config Config
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return config, err
+	}
+	err = json.Unmarshal(data, &config)
+	return config, err
+}
+
+func GetServerIPs(config *Config) []string {
 	ips := os.Getenv("SERVER_IPS")
+
+	if ips == "" {
+		return config.Servers
+	}
 	return strings.Split(ips, ",")
 }
 
-// --- weight math (unchanged) ---
-// erf, normCDF, and score functions remain the same...
-// [Truncated for brevity]
+func normCDF(x, mu, sigma float64) float64 {
+	normal := distuv.Normal{Mu: mu, Sigma: sigma}
+	return normal.CDF(x)
+}
 
-// PickServer attempts to update the global snapshot.
-// If the mutex is locked, it immediately uses the last known snapshot.
-func PickServer() *serverHealth {
-	// 1. Try to get a lock to refresh the snapshot
-	if mu.TryRLock() {
-		newSnap := make([]serverHealth, len(servers))
-		copy(newSnap, servers)
-		snap.Store(newSnap) // Atomically update the global snap
-		mu.RUnlock()
+func score(s *serverHealth) float64 {
+	return 0.95*float64(s.CPUUsage) + 0.05*float64(s.MemUsage)
+}
+
+func (lb *LoadBalancer) recomputeWeights() {
+	scores := make([]float64, len(servers))
+	for i := range servers {
+		scores[i] = score(&servers[i])
 	}
 
-	// 2. Load the current snapshot (will be the "old" one if TryRLock failed)
-	s, ok := snap.Load().([]serverHealth)
-	if !ok || len(s) == 0 {
-		return nil
-	}
-
-	scores := make([]float64, len(s))
-	for i, server := range s {
-		scores[i] = score(server)
-	}
-
-	// ... [Rest of your Inverse-CDF logic using 's' instead of 'snap'] ...
-	// Note: ensure you use the local variable 's' for the math below
-
-	var sum, mean float64
+	var sum float64
 	for _, sc := range scores {
 		sum += sc
 	}
-	mean = sum / float64(len(scores))
+	mean := sum / float64(len(scores))
 
 	var variance float64
 	for _, sc := range scores {
@@ -78,10 +91,10 @@ func PickServer() *serverHealth {
 	}
 	sigma := math.Sqrt(variance / float64(len(scores)))
 
-	weights := make([]float64, len(s))
+	weights := make([]float64, len(servers))
 	if sigma < 1e-9 {
 		for i := range weights {
-			weights[i] = 1.0 / float64(len(s))
+			weights[i] = 1.0 / float64(len(servers))
 		}
 	} else {
 		var total float64
@@ -94,41 +107,39 @@ func PickServer() *serverHealth {
 		}
 	}
 
+	lb.weights = weights
+}
+
+func (lb *LoadBalancer) PickServer() *serverHealth {
+	lb.Mutex.RLock()
+	defer lb.Mutex.RUnlock()
+
 	r := rand.Float64()
-	for i, w := range weights {
+	for i, w := range lb.weights {
 		r -= w
 		if r <= 0 {
-			return &s[i]
-		}
-	}
-	return &s[len(s)-1]
-}
-
-// healthCheck now updates the master 'servers' slice
-func healthCheck() {
-	for {
-		// Optimization: Don't hold the lock for the ENTIRE duration of network calls.
-		// That would block PickServer for seconds.
-		for i := range servers {
-			// Perform gRPC call outside of the lock
-			res, err := checkSingleServer(servers[i].IP)
-			if err != nil {
-				log.Printf("error checking %s: %v", servers[i].IP, err)
-				continue
+			servers[i].Mutex.Lock()
+			isHealthy := servers[i].IsHealthy
+			servers[i].Mutex.Unlock()
+			if isHealthy {
+				return &servers[i]
 			}
-
-			// Only lock when writing the data back to the master slice
-			mu.Lock()
-			servers[i].CPUUsage = res.cpu
-			servers[i].MemUsage = res.mem
-			servers[i].LastCheck = time.Now()
-			mu.Unlock()
+			continue
 		}
-		time.Sleep(10 * time.Second)
 	}
+	// fallback: return last healthy server
+	for i := len(servers) - 1; i >= 0; i-- {
+		servers[i].Mutex.Lock()
+		isHealthy := servers[i].IsHealthy
+		servers[i].Mutex.Unlock()
+		if isHealthy {
+			return &servers[i]
+		}
+	}
+	return nil
 }
 
-type checkRes struct{ cpu, mem float32 }
+type checkRes struct{ cpu, mem float64 }
 
 func checkSingleServer(ip string) (checkRes, error) {
 	conn, err := grpc.NewClient(ip, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -137,7 +148,7 @@ func checkSingleServer(ip string) (checkRes, error) {
 	}
 	defer conn.Close()
 
-	client := pb.NewHealthCheckClient(conn)
+	client := pb.NewHealthCheckServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -145,20 +156,77 @@ func checkSingleServer(ip string) (checkRes, error) {
 	if err != nil {
 		return checkRes{}, err
 	}
-	return checkRes{cpu: response.GetCpuUsage(), mem: response.GetMemoryUsage()}, nil
+	return checkRes{cpu: response.CpuUsage, mem: response.MemoryUsage}, nil
+}
+
+func healthCheck(lb *LoadBalancer, server *serverHealth, interval time.Duration) {
+	for range time.Tick(interval) {
+		res, err := checkSingleServer(server.IP)
+
+		server.Mutex.Lock()
+		if err != nil {
+			log.Printf("error checking %s: %v", server.IP, err)
+			server.IsHealthy = false
+		} else {
+			server.CPUUsage = res.cpu
+			server.MemUsage = res.mem
+			server.LastCheck = time.Now()
+			server.IsHealthy = true
+			log.Printf("server %s — CPU: %.1f%%, Memory: %.1f%%", server.IP, server.CPUUsage, server.MemUsage)
+			if server.CPUUsage > 90.0 {
+				log.Printf("WARNING: server %s CPU usage critical: %.1f%%", server.IP, server.CPUUsage)
+			}
+			if server.MemUsage > 90.0 {
+				log.Printf("WARNING: server %s memory usage critical: %.1f%%", server.IP, server.MemUsage)
+			}
+		}
+		server.Mutex.Unlock()
+
+		lb.Mutex.Lock()
+		lb.recomputeWeights()
+		lb.Mutex.Unlock()
+	}
 }
 
 func main() {
-	initialServers := []serverHealth{}
-	for _, ip := range GetServerIPs() {
-		log.Printf("registering server: %s", ip)
-		initialServers = append(initialServers, serverHealth{IP: ip})
+	config, err := loadConfig("config.json")
+	if err != nil {
+		log.Fatalf("error loading configuration: %s", err)
 	}
-	servers = initialServers
 
-	// Initialize the atomic snapshot so PickServer doesn't crash on start
-	snap.Store(servers)
+	healthCheckInterval, err := time.ParseDuration(config.HealthCheckInterval)
+	if err != nil {
+		log.Fatalf("invalid health check interval: %s", err)
+	}
 
-	go healthCheck()
-	select {}
+	for _, ip := range GetServerIPs(&config) {
+		log.Printf("registering server: %s", ip)
+		u, err := url.Parse("http://" + ip)
+		if err != nil {
+			log.Fatalf("invalid server address %s: %v", ip, err)
+		}
+		servers = append(servers, serverHealth{IP: ip, URL: u})
+	}
+
+	lb := &LoadBalancer{}
+	lb.recomputeWeights()
+
+	for i := range servers {
+		go healthCheck(lb, &servers[i], healthCheckInterval)
+	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		server := lb.PickServer()
+		if server == nil {
+			http.Error(w, "no healthy server available", http.StatusServiceUnavailable)
+			return
+		}
+		w.Header().Add("X-Forwarded-Server", server.URL.String())
+		httputil.NewSingleHostReverseProxy(server.URL).ServeHTTP(w, r)
+	})
+
+	log.Println("starting load balancer on port", config.Port)
+	if err = http.ListenAndServe(config.Port, nil); err != nil {
+		log.Fatalf("error starting load balancer: %s", err)
+	}
 }

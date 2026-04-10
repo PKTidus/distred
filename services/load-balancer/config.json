@@ -1,0 +1,8 @@
+{
+  "port": ":8080",
+  "healthCheckInterval": "2s",
+  "servers": [
+    "http://api-gateway-1:8000",
+    "http://api-gateway-2:8000"
+  ]
+}

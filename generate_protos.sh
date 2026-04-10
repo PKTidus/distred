@@ -42,8 +42,8 @@ generate_go_proto() {
 
     protoc \
         -I"$PROTO_SRC" \
-        --go_out="$DEST_DIR" --go_opt=paths=source_relative \
-        --go-grpc_out="$DEST_DIR" --go-grpc_opt=paths=source_relative \
+        --go_out="$DEST_DIR" \
+        --go-grpc_out="$DEST_DIR" \
         "$PROTO_SRC/$FILE_NAME.proto"
 }
 
@@ -79,6 +79,6 @@ generate_proto "subreddit" "./services/post-service/generated"
 generate_proto "health-check" "./services/api-gateway/generated"
 
 # health-check.proto -> health-check-service (server)
-generate_go_proto "health-check" "./services/load-balancer/generated"
+generate_go_proto "health-check" "./services/load-balancer"
 
 echo "Done! Protos generated and imports fixed."

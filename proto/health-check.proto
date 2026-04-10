@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package healthcheck;
-option go_package = "./main";
+option go_package = "./generated";
 // Simple health check service to monitor CPU and memory usage of each api gateway instance.
 service HealthCheckService {
     // Returns current CPU and memory usage percentages for the instance.
