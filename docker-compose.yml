@@ -1,11 +1,11 @@
 services:
-  api-gateway:
+  api-gateway-2:
     build:
       context: ./services/api-gateway
       dockerfile: Dockerfile
-    ports:
-      - 8000:8000
-      - 50051:50051 # healthcheck port for the load balancer
+    # ports:
+    #   - 8000:8000
+    #   - 50051:50051
     volumes:
       - ./services/api-gateway:/app
     depends_on:
@@ -29,6 +29,46 @@ services:
       - REDIS_HOST=gateway-cache
       - REDIS_PORT=6379
       - SECRET_KEY=dev-secret-key
+  api-gateway-1:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    # ports:
+    #   - 8000:8000
+    #   - 50051:50051
+    volumes:
+      - ./services/api-gateway:/app
+    depends_on:
+      - feed-service
+      - user-service
+      - post-service
+      - subreddit-service
+      - vote-service
+      - gateway-cache
+    environment:
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=50051
+      - POST_SERVICE_HOST=post-service
+      - POST_SERVICE_PORT=50051
+      - SUBREDDIT_SERVICE_HOST=subreddit-service
+      - SUBREDDIT_SERVICE_PORT=50051
+      - VOTE_SERVICE_HOST=vote-service
+      - VOTE_SERVICE_PORT=50051
+      - FEED_SERVICE_HOST=feed-service
+      - FEED_SERVICE_PORT=50051
+      - REDIS_HOST=gateway-cache
+      - REDIS_PORT=6379
+      - SECRET_KEY=dev-secret-key
+
+  load-balancer:
+    build:
+      context: ./services/load-balancer
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - api-gateway-1
+      - api-gateway-2
 
   feed-service:
     build:

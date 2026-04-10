@@ -142,7 +142,7 @@ func (lb *LoadBalancer) PickServer() *serverHealth {
 type checkRes struct{ cpu, mem float64 }
 
 func checkSingleServer(ip string) (checkRes, error) {
-	conn, err := grpc.NewClient(ip, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(ip+":50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return checkRes{}, err
 	}
@@ -172,7 +172,7 @@ func healthCheck(lb *LoadBalancer, server *serverHealth, interval time.Duration)
 			server.MemUsage = res.mem
 			server.LastCheck = time.Now()
 			server.IsHealthy = true
-			log.Printf("server %s — CPU: %.1f%%, Memory: %.1f%%", server.IP, server.CPUUsage, server.MemUsage)
+			// log.Printf("server %s — CPU: %.1f%%, Memory: %.1f%%", server.IP, server.CPUUsage, server.MemUsage)
 			if server.CPUUsage > 90.0 {
 				log.Printf("WARNING: server %s CPU usage critical: %.1f%%", server.IP, server.CPUUsage)
 			}
@@ -201,7 +201,7 @@ func main() {
 
 	for _, ip := range GetServerIPs(&config) {
 		log.Printf("registering server: %s", ip)
-		u, err := url.Parse("http://" + ip)
+		u, err := url.Parse("http://" + ip + config.Port)
 		if err != nil {
 			log.Fatalf("invalid server address %s: %v", ip, err)
 		}
@@ -221,6 +221,7 @@ func main() {
 			http.Error(w, "no healthy server available", http.StatusServiceUnavailable)
 			return
 		}
+		println("forwarding request to", server.IP)
 		w.Header().Add("X-Forwarded-Server", server.URL.String())
 		httputil.NewSingleHostReverseProxy(server.URL).ServeHTTP(w, r)
 	})
