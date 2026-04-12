@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash, make_response, g
 from clients import user_client
-from middleware import require_auth, extract_bearer_token
+from middleware import require_auth, extract_bearer_token, evict_token
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -61,6 +61,7 @@ def logout():
     token = extract_bearer_token()
     if token:
         user_client.logout(token=token)
+        evict_token(token)
 
     response = make_response(redirect(url_for("feed.home")))
     response.delete_cookie("access_token")
@@ -72,6 +73,4 @@ def logout():
 @require_auth
 def get_me():
     """Return the currently authenticated user's profile."""
-    token = extract_bearer_token()
-    result = user_client.get_current_user(token=token)
-    return {"id": result.id, "username": result.username, "error": result.error}
+    return {"id": g.user_id, "username": g.username}

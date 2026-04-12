@@ -33,16 +33,6 @@ def register(username: str, password: str) -> dict:
     return {"success": True}
 
 
-def validate_token(token: str) -> dict:
-    stub = get_stub()
-    response = stub.ValidateToken(user_pb2.ValidateTokenRequest(token=token))
-    return {
-        "valid": response.valid,
-        "username": response.username,
-        "error": response.error,
-    }
-
-
 def get_current_user(token: str) -> user_pb2.UserResponse:
     stub = get_stub()
     response = stub.GetCurrentUser(user_pb2.GetCurrentUserRequest(token=token))

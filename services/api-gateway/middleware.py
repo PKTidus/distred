@@ -3,7 +3,7 @@ from typing import Optional
 
 from flask import g, redirect, request, url_for, session
 
-from clients.user_client import validate_token, get_current_user
+from clients.user_client import get_current_user
 import redis_cache as cache
 
 
@@ -31,23 +31,25 @@ def require_auth(f):
         result = cache.get_cached_result(token)
         if result is None:
             # if not cached, check via rpc and cache
-            result = validate_token(token)
-            if result.get("valid"):
-                cache.cache_token(token, result)
+            # get_current_user also validates the token
+            user_resp = get_current_user(token)
+            if not user_resp or user_resp.error:
+                return redirect(url_for("auth.login_form", next=request.url))
+            
+            result = {
+                "valid": True,
+                "username": user_resp.username,
+                "user_id": user_resp.id
+            }
+            cache.cache_token(token, result)
 
         if not result or not result.get("valid"):
             return redirect(url_for("auth.login_form", next=request.url))
 
         g.username = result["username"]
+        g.user_id = result["user_id"]
         g.token = token
         
-        from clients.user_client import get_current_user
-        user_resp = get_current_user(token)
-        if not user_resp.error:
-            g.user_id = user_resp.id
-        else:
-            g.user_id = 0
-            
         return f(*args, **kwargs)
 
     return decorated
@@ -63,17 +65,19 @@ def optional_auth(f):
         if token:
             result = cache.get_cached_result(token)
             if result is None:
-                result = validate_token(token)
-                if result.get("valid"):
+                user_resp = get_current_user(token)
+                if user_resp and not user_resp.error:
+                    result = {
+                        "valid": True,
+                        "username": user_resp.username,
+                        "user_id": user_resp.id
+                    }
                     cache.cache_token(token, result)
             
             if result and result.get("valid"):
                 g.username = result["username"]
+                g.user_id = result["user_id"]
                 g.token = token
-                # We might need user_id too
-                user_resp = get_current_user(token)
-                if not user_resp.error:
-                    g.user_id = user_resp.id
 
         return f(*args, **kwargs)
     return decorated
