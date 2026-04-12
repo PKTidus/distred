@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import sys
+import argparse
 
 
 def load_and_prep(path):
@@ -58,9 +58,10 @@ def plot_comparison(file_a, file_b, label_a="LB A", label_b="LB B"):
 
 
 if __name__ == "__main__":
-    # Usage: python compare.py run_a.csv run_b.csv "NGINX" "HAProxy"
-    file_a = sys.argv[1] if len(sys.argv) > 1 else "run_a.csv"
-    file_b = sys.argv[2] if len(sys.argv) > 2 else "run_b.csv"
-    label_a = sys.argv[3] if len(sys.argv) > 3 else "LB A"
-    label_b = sys.argv[4] if len(sys.argv) > 4 else "LB B"
-    plot_comparison(file_a, file_b, label_a, label_b)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file_a", default="run_a.csv")
+    parser.add_argument("file_b", default="run_b.csv")
+    parser.add_argument("label_a", default="LB A")
+    parser.add_argument("label_b", default="LB B")
+    args = parser.parse_args()
+    plot_comparison(args.file_a, args.file_b, args.label_a, args.label_b)

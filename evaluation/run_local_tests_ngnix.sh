@@ -1,1 +1,0 @@
-locust -f locustfile.py --headless --csv=nginx --host http://localhost:8001  --csv report --only-summary

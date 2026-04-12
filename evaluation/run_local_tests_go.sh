@@ -1,1 +1,0 @@
-locust -f locustfile.py --headless --csv=go --host http://localhost:8000  --csv report --only-summary

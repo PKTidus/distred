@@ -1,8 +1,6 @@
 import random
 import string
-import functools
-from locust import FastHttpUser, LoadTestShape, task, between
-from locust.exception import StopUser
+from locust import FastHttpUser, LoadTestShape, task
 
 # --- GLOBAL SHARED STATE ---
 shared_post_ids = []
@@ -11,22 +9,6 @@ shared_subreddits = []
 
 def random_string(length=10):
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
-
-
-def limit_actions(max_actions):
-    """Custom decorator to kill the user after X actions."""
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            self.action_count += 1
-            if self.action_count > max_actions:
-                raise StopUser()
-            return func(self, *args, **kwargs)
-
-        return wrapper
-
-    return decorator
 
 
 class StaircaseShape(LoadTestShape):
@@ -93,8 +75,7 @@ class RedditGatewayTester(FastHttpUser):
             name="/post/ (Create)",
         )
 
-        # FIX 3: Handle both redirect AND direct 200/201 responses
-        if resp.status_code in (301, 302):
+        if resp and resp.status_code in (301, 302) and resp.headers:
             location = resp.headers.get("Location", "")
             post_id = location.rstrip("/").split("/")[-1]
             if post_id.isdigit():
@@ -105,13 +86,11 @@ class RedditGatewayTester(FastHttpUser):
     # ==========================================
 
     @task(23)
-    @limit_actions(1000)
     def view_home_feed(self):
         sort_by = random.choice(["hot", "top", "new"])
         self.client.get(f"/?sort={sort_by}", name="/ (Home Feed)")
 
     @task(23)
-    @limit_actions(1000)
     def view_random_subreddit(self):
         if shared_subreddits:
             slug = random.choice(shared_subreddits)
@@ -119,7 +98,6 @@ class RedditGatewayTester(FastHttpUser):
             self.client.get(f"/r/{slug}?sort={sort_by}", name="/r/[slug]")
 
     @task(23)
-    @limit_actions(1000)
     def view_random_post(self):
         if shared_post_ids:
             post_id = random.choice(shared_post_ids)
@@ -130,7 +108,6 @@ class RedditGatewayTester(FastHttpUser):
     # ==========================================
 
     @task(29)
-    @limit_actions(1000)
     def vote_on_random_post(self):
         if shared_post_ids:
             post_id = random.choice(shared_post_ids)
@@ -147,7 +124,6 @@ class RedditGatewayTester(FastHttpUser):
     # ==========================================
 
     @task(1)
-    @limit_actions(1000)
     def create_random_post(self):
         target_sub = (
             random.choice(shared_subreddits)
@@ -157,7 +133,6 @@ class RedditGatewayTester(FastHttpUser):
         self._create_post(target_sub)
 
     @task(1)
-    @limit_actions(1000)
     def create_random_subreddit(self):
         new_sub_name = f"sub_{random_string()}"
         resp = self.client.post(

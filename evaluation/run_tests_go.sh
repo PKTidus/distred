@@ -1,1 +1,0 @@
-locust -f locustfile.py --headless --csv=remote_go --host http://34.106.186.215  --csv report --only-summary
