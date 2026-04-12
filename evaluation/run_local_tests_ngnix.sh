@@ -1,1 +1,1 @@
-locust -f locustfile.py --headless --users 1 --spawn-rate 2 -H http://localhost:8001
+locust -f locustfile.py --headless --users 100 --spawn-rate 2 -H http://localhost:8001  --csv report --only-summary
