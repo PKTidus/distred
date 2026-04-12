@@ -71,8 +71,8 @@ def make_plot(datasets, y_col, title, ylabel):
         )
         ax.text(
             t + 2,
-            ax.get_ylim()[1],
-            f"{STAGES[i + 1]['users']}users",
+            ax.get_ylim()[1] - (ax.get_ylim()[1] * 0.05),
+            f"{STAGES[i + 1]['users']} users",
             fontsize=8,
             color="black",
             va="top",
