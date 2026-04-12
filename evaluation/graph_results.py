@@ -31,63 +31,92 @@ def save_plot(fig, filename):
     print(f"Saved {path}")
 
 
-def make_plot(datasets, x_col, y_col, title, ylabel):
+STAGES = [
+    {"duration": 60, "users": 10, "spawn_rate": 5},
+    {"duration": 120, "users": 50, "spawn_rate": 10},
+    {"duration": 180, "users": 100, "spawn_rate": 10},
+    {"duration": 240, "users": 200, "spawn_rate": 20},
+    {"duration": 300, "users": 500, "spawn_rate": 50},
+]
+
+RAMP_TIMES = [s["duration"] for s in STAGES[:-1]]  # exclude the last — no step after it
+
+
+def make_plot(datasets, y_col, title, ylabel):
     fig, ax = plt.subplots(figsize=(12, 5))
     ax.set_title(title, fontsize=14)
-    ax.set_xlabel("Concurrent Users")
+    ax.set_xlabel("Time (seconds)")
     ax.set_ylabel(ylabel)
     ax.grid(True, alpha=0.4)
 
     for df, label, color, linestyle in datasets:
         if y_col in df.columns:
-            ax.plot(df[x_col], df[y_col], label=label, color=color, linestyle=linestyle)
+            ax.plot(
+                df["Seconds"],
+                df[y_col],
+                label=label,
+                color=color,
+                linestyle=linestyle,
+                linewidth=2,
+            )
+
+    for i, t in enumerate(RAMP_TIMES):
+        ax.axvline(
+            x=t,
+            color="black",
+            linestyle=":",
+            linewidth=1,
+            alpha=0.7,
+            label="Ramp-up" if i == 0 else None,
+        )
+        ax.text(
+            t + 2,
+            ax.get_ylim()[1],
+            f"{STAGES[i + 1]['users']}users",
+            fontsize=8,
+            color="black",
+            va="top",
+        )
 
     if ax.get_legend_handles_labels()[0]:
         ax.legend()
-
     return fig
 
 
 def plot_comparison(
     file_a, file_b, file_c=None, label_a="LB A", label_b="LB B", label_c="LB C"
 ):
-    raw_datasets = [
+    datasets = [
         (load_and_prep(file_a), label_a, "steelblue", "solid"),
         (load_and_prep(file_b), label_b, "tomato", "solid"),
     ]
     if file_c:
-        raw_datasets.append((load_and_prep(file_c), label_c, "green", "solid"))
+        datasets.append((load_and_prep(file_c), label_c, "green", "solid"))
 
-    subtitle = " vs ".join(label for _, label, _, _ in raw_datasets)
+    subtitle = " vs ".join(label for _, label, _, _ in datasets)
 
     percentile_cols = ["50%", "75%", "90%", "95%", "99%", "99.9%", "100%"]
 
     # Throughput
-    fig = make_plot(
-        raw_datasets, "User Count", "Requests/s", f"Throughput — {subtitle}", "Req/s"
-    )
+    fig = make_plot(datasets, "Requests/s", f"Throughput — {subtitle}", "Req/s")
     save_plot(fig, "throughput.png")
 
     # Each percentile
     for col in percentile_cols:
         safe_name = col.replace(".", "_").replace("%", "pct")
-        fig = make_plot(
-            raw_datasets, "User Count", col, f"p{col} Latency — {subtitle}", "ms"
-        )
+        fig = make_plot(datasets, col, f"p{col} Latency — {subtitle}", "ms")
         save_plot(fig, f"latency_{safe_name}.png")
 
-    # Error rate — computed column, handle separately
+    # Error rate
     error_datasets = []
-    for df, label, color, ls in raw_datasets:
+    for df, label, color, ls in datasets:
         df = df.copy()
         df["Error Rate %"] = (
             df["Failures/s"] / df["Requests/s"].replace(0, float("nan"))
         ) * 100
         error_datasets.append((df, label, color, ls))
 
-    fig = make_plot(
-        error_datasets, "User Count", "Error Rate %", f"Error Rate — {subtitle}", "%"
-    )
+    fig = make_plot(error_datasets, "Error Rate %", f"Error Rate — {subtitle}", "%")
     save_plot(fig, "error_rate.png")
 
 
