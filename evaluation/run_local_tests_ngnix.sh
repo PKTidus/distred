@@ -1,0 +1,1 @@
+locust -f locustfile.py --headless --users 1 --spawn-rate 2 -H http://localhost:8001
