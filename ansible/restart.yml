@@ -19,4 +19,5 @@
         state: started
         restart_policy: always
         ports: "{{ service_ports | default([]) }}"
+        volumes: "{{ service_volumes | default([]) }}"
         env: "{{ container_env | default({}) }}"
