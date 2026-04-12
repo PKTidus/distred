@@ -27,22 +27,21 @@ type serverHealth struct {
 	MemUsage  float64
 	LastCheck time.Time
 	URL       *url.URL
+	Proxy     *httputil.ReverseProxy
 	IsHealthy bool
-	Mutex     sync.Mutex
+	Mutex     sync.RWMutex
 }
 
 type LoadBalancer struct {
-	Mutex   sync.RWMutex
+	sync.RWMutex
 	weights []float64
+	servers []*serverHealth
 }
-
 type Config struct {
 	Port                string   `json:"port"`
 	HealthCheckInterval string   `json:"healthCheckInterval"`
 	Servers             []string `json:"servers"`
 }
-
-var servers []serverHealth
 
 func loadConfig(file string) (Config, error) {
 	var config Config
@@ -73,9 +72,14 @@ func score(s *serverHealth) float64 {
 }
 
 func (lb *LoadBalancer) recomputeWeights() {
-	scores := make([]float64, len(servers))
-	for i := range servers {
-		scores[i] = score(&servers[i])
+	lb.Lock()
+	defer lb.Unlock()
+
+	scores := make([]float64, len(lb.servers))
+	for i, s := range lb.servers {
+		s.Mutex.RLock()
+		scores[i] = score(s)
+		s.Mutex.RUnlock()
 	}
 
 	var sum float64
@@ -91,10 +95,10 @@ func (lb *LoadBalancer) recomputeWeights() {
 	}
 	sigma := math.Sqrt(variance / float64(len(scores)))
 
-	weights := make([]float64, len(servers))
+	weights := make([]float64, len(lb.servers))
 	if sigma < 1e-9 {
 		for i := range weights {
-			weights[i] = 1.0 / float64(len(servers))
+			weights[i] = 1.0 / float64(len(lb.servers))
 		}
 	} else {
 		var total float64
@@ -102,8 +106,14 @@ func (lb *LoadBalancer) recomputeWeights() {
 			weights[i] = 1 - normCDF(sc, mean, sigma)
 			total += weights[i]
 		}
-		for i := range weights {
-			weights[i] /= total
+		if total > 0 {
+			for i := range weights {
+				weights[i] /= total
+			}
+		} else {
+			for i := range weights {
+				weights[i] = 1.0 / float64(len(lb.servers))
+			}
 		}
 	}
 
@@ -111,29 +121,32 @@ func (lb *LoadBalancer) recomputeWeights() {
 }
 
 func (lb *LoadBalancer) PickServer() *serverHealth {
-	lb.Mutex.RLock()
-	defer lb.Mutex.RUnlock()
+	lb.RLock()
+	weights := lb.weights
+	lb.RUnlock()
 
 	r := rand.Float64()
-	for i, w := range lb.weights {
+	for i, w := range weights {
 		r -= w
 		if r <= 0 {
-			servers[i].Mutex.Lock()
-			isHealthy := servers[i].IsHealthy
-			servers[i].Mutex.Unlock()
+			s := lb.servers[i]
+			s.Mutex.RLock()
+			isHealthy := s.IsHealthy
+			s.Mutex.RUnlock()
 			if isHealthy {
-				return &servers[i]
+				return s
 			}
-			continue
+			break // try fallback if picked is unhealthy
 		}
 	}
-	// fallback: return last healthy server
-	for i := len(servers) - 1; i >= 0; i-- {
-		servers[i].Mutex.Lock()
-		isHealthy := servers[i].IsHealthy
-		servers[i].Mutex.Unlock()
+
+	// fallback: find first healthy server
+	for _, s := range lb.servers {
+		s.Mutex.RLock()
+		isHealthy := s.IsHealthy
+		s.Mutex.RUnlock()
 		if isHealthy {
-			return &servers[i]
+			return s
 		}
 	}
 	return nil
@@ -149,7 +162,7 @@ func checkSingleServer(ip string) (checkRes, error) {
 	defer conn.Close()
 
 	client := pb.NewHealthCheckServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
 	response, err := client.Check(ctx, &pb.HealthCheckRequest{})
@@ -160,7 +173,9 @@ func checkSingleServer(ip string) (checkRes, error) {
 }
 
 func healthCheck(lb *LoadBalancer, server *serverHealth, interval time.Duration) {
-	for range time.Tick(interval) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for range ticker.C {
 		res, err := checkSingleServer(server.IP)
 
 		server.Mutex.Lock()
@@ -172,7 +187,6 @@ func healthCheck(lb *LoadBalancer, server *serverHealth, interval time.Duration)
 			server.MemUsage = res.mem
 			server.LastCheck = time.Now()
 			server.IsHealthy = true
-			// log.Printf("server %s — CPU: %.1f%%, Memory: %.1f%%", server.IP, server.CPUUsage, server.MemUsage)
 			if server.CPUUsage > 90.0 {
 				log.Printf("WARNING: server %s CPU usage critical: %.1f%%", server.IP, server.CPUUsage)
 			}
@@ -181,10 +195,6 @@ func healthCheck(lb *LoadBalancer, server *serverHealth, interval time.Duration)
 			}
 		}
 		server.Mutex.Unlock()
-
-		lb.Mutex.Lock()
-		lb.recomputeWeights()
-		lb.Mutex.Unlock()
 	}
 }
 
@@ -199,21 +209,39 @@ func main() {
 		log.Fatalf("invalid health check interval: %s", err)
 	}
 
+	lb := &LoadBalancer{}
+
 	for _, ip := range GetServerIPs(&config) {
 		log.Printf("registering server: %s", ip)
 		u, err := url.Parse("http://" + ip + config.Port)
 		if err != nil {
 			log.Fatalf("invalid server address %s: %v", ip, err)
 		}
-		servers = append(servers, serverHealth{IP: ip, URL: u})
+		proxy := httputil.NewSingleHostReverseProxy(u)
+		// Tune proxy for performance
+		proxy.Transport = &http.Transport{
+			MaxIdleConns:        100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout:     90 * time.Second,
+		}
+
+		s := &serverHealth{IP: ip, URL: u, Proxy: proxy, IsHealthy: true}
+		lb.servers = append(lb.servers, s)
 	}
 
-	lb := &LoadBalancer{}
 	lb.recomputeWeights()
 
-	for i := range servers {
-		go healthCheck(lb, &servers[i], healthCheckInterval)
+	for _, s := range lb.servers {
+		go healthCheck(lb, s, healthCheckInterval)
 	}
+
+	// Periodic weight recomputation to avoid doing it in every health check loop
+	go func() {
+		ticker := time.NewTicker(2 * time.Second)
+		for range ticker.C {
+			lb.recomputeWeights()
+		}
+	}()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		server := lb.PickServer()
@@ -221,13 +249,17 @@ func main() {
 			http.Error(w, "no healthy server available", http.StatusServiceUnavailable)
 			return
 		}
-		println("forwarding request to", server.IP)
-		w.Header().Add("X-Forwarded-Server", server.URL.String())
-		httputil.NewSingleHostReverseProxy(server.URL).ServeHTTP(w, r)
+		server.Proxy.ServeHTTP(w, r)
 	})
 
 	log.Println("starting load balancer on port", config.Port)
-	if err = http.ListenAndServe(config.Port, nil); err != nil {
+	server := &http.Server{
+		Addr:         config.Port,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+	if err = server.ListenAndServe(); err != nil {
 		log.Fatalf("error starting load balancer: %s", err)
 	}
 }
