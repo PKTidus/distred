@@ -22,6 +22,14 @@ gcloud compute instances create load-balancer-nginx \
   --boot-disk-size=10GB \
   --tags=load-balancer,frontend
 
+gcloud compute instances create load-balancer-haproxy \
+  --zone=$ZONE \
+  --machine-type=$MACHINE \
+  --image-family=$IMAGE_FAMILY \
+  --image-project=$IMAGE_PROJECT \
+  --boot-disk-size=10GB \
+  --tags=load-balancer,frontend
+
 # Create 3 API Gateways (Internal only)
 for i in 0 1 2; do
   gcloud compute instances create api-gateway-$i \
