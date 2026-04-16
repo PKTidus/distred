@@ -1,1 +1,1 @@
-ansible-playbook -i hosts.yml deploy.yml
+ansible-playbook -i hosts.yml deploy.yml --ask-vault-pass

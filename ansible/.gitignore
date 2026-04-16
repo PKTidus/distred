@@ -1,0 +1,13 @@
+# Ansible
+*.retry
+*.vault_pass
+.ansible_cache/
+group_vars/*.retry
+
+# Fact caching
+/tmp/ansible_facts
+
+# Docker & OS
+.DS_Store
+*.swp
+*.log
