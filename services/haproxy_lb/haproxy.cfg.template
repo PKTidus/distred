@@ -1,0 +1,21 @@
+global
+    log stdout format raw local0
+    user haproxy
+    group haproxy
+    maxconn 2000
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+frontend http-in
+    bind *:80
+    default_backend servers
+
+backend servers
+    ${BACKENDS}
