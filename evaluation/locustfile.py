@@ -1,8 +1,6 @@
 import random
 import string
-import time
 from locust import FastHttpUser, LoadTestShape, task
-from locust.exception import StopUser
 
 # --- GLOBAL SHARED STATE ---
 shared_post_ids = []
@@ -24,33 +22,31 @@ class StaircaseShape(LoadTestShape):
 
     def tick(self):
         run_time = self.get_run_time()
-        for stage in self.stages:
+
+        for i, stage in enumerate(self.stages):
             if run_time < stage["duration"]:
-                return stage["users"], stage["spawn_rate"]
-        return None  # Returning None stops the test
+                start_time = self.stages[i - 1]["duration"] if i > 0 else 0
+                start_users = self.stages[i - 1]["users"] if i > 0 else 0
+
+                stage_duration = stage["duration"] - start_time
+                midpoint = start_time + stage_duration / 2
+
+                if run_time < midpoint:
+                    # Ramp up to full users by the midpoint
+                    progress = (run_time - start_time) / (stage_duration / 2)
+                    current_users = round(
+                        start_users + (stage["users"] - start_users) * progress
+                    )
+                else:
+                    # Hold flat for the second half
+                    current_users = stage["users"]
+
+                return current_users, stage["spawn_rate"]
+
+        return None
 
 
 class RedditGatewayTester(FastHttpUser):
-    def post_with_retry(self, url, data, max_retries=5, backoff=2.0):
-        for attempt in range(max_retries):
-            with self.client.post(
-                url, data=data, catch_response=True, allow_redirects=False
-            ) as resp:
-                if resp.status_code in (200, 201, 301, 302):
-                    resp.success()
-                    return resp
-                elif resp.status_code in (500, 502, 503):
-                    wait = backoff**attempt  # 1s, 2s, 4s, 8s, 16s
-                    resp.failure(
-                        f"{url} returned {resp.status_code}, retrying in {wait:.1f}s"
-                    )
-                    time.sleep(wait)
-                else:
-                    resp.failure(f"{url} unexpected {resp.status_code}")
-                    return resp  # don't retry 4xx
-        # Return a dummy-like indicator after exhausting retries
-        raise StopUser()
-
     def on_start(self):
         self.action_count = 0
         self.authenticated = False
@@ -58,16 +54,16 @@ class RedditGatewayTester(FastHttpUser):
         self.password = "password123"
         self.subreddit_name = f"sub_{random_string()}"
 
-        self.post_with_retry(
+        self.client.post(
             "/auth/register", {"username": self.username, "password": self.password}
         )
-        self.post_with_retry(
+        self.client.post(
             "/auth/login", {"username": self.username, "password": self.password}
         )
 
         self.authenticated = True
 
-        self.post_with_retry(
+        self.client.post(
             "/subreddit/create",
             {"name": self.subreddit_name, "description": "Load testing subreddit"},
         )
