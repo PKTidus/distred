@@ -1,5 +1,6 @@
 grpcio==1.78.0
 sqlalchemy==2.0.46
+psycopg2-binary
 typing-extensions==4.15.0
 grpcio-tools==1.78.0
 protobuf==6.33.5

@@ -107,10 +107,12 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/user-service:/app
-      - ./user_db_data:/data
     environment:
-      - DB_NAME=user_service.sqlite
+      - DATABASE_URL=postgresql://user:password@db:5432/user_db
       - PORT=50051
+    depends_on:
+      db:
+        condition: service_healthy
 
   post-service:
     build:
@@ -120,10 +122,14 @@ services:
       - ./services/post-service:/app
       - ./post_db_data:/data
     depends_on:
-      - user-service
-      - vote-service
+      user-service:
+        condition: service_started
+      vote-service:
+        condition: service_started
+      db:
+        condition: service_healthy
     environment:
-      - DB_NAME=post_service.sqlite
+      - DATABASE_URL=postgresql://user:password@db:5432/post_db
       - USER_SERVICE_HOST=user-service
       - USER_SERVICE_PORT=50051
       - VOTE_SERVICE_HOST=vote-service
@@ -136,10 +142,12 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/subreddit-service:/app
-      - ./subreddit_db_data:/data
     environment:
-      - DB_NAME=subreddit_service.sqlite
+      - DATABASE_URL=postgresql://user:password@db:5432/subreddit_db
       - PORT=50051
+    depends_on:
+      db:
+        condition: service_healthy
 
   vote-service:
     build:
@@ -147,12 +155,28 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/vote-service:/app
-      - ./vote_db_data:/data
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      - DB_NAME=vote_service.sqlite
+      - DATABASE_URL=postgresql://user:password@db:5432/vote_db
       - POST_SERVICE_HOST=post-service
       - POST_SERVICE_PORT=50051
       - PORT=50051
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_MULTIPLE_DATABASES: user_db,post_db,subreddit_db,vote_db
+    volumes:
+      - ./services/database/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d user_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   gateway-cache:
     build:
