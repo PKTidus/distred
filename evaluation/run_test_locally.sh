@@ -6,4 +6,10 @@ sleep 10
 
 echo "Running load balancer test on Nginx"
 locust -f locustfile.py --headless --host http://localhost:8001  --csv nginx --only-summary
-python3 graph_results.py go_stats_history.csv nginx_stats_history.csv "Go Server" "Nginx"
+
+# wait 10 seconds to ensure all data is flushed
+sleep 10
+
+echo "Running load balancer test on HAProxy"
+locust -f locustfile.py --headless --host http://localhost:8002  --csv haproxy --only-summary
+python3 graph_results.py go_stats_history.csv nginx_stats_history.csv haproxy_stats_history.csv "Go Server" "Nginx" "HA Proxy"
